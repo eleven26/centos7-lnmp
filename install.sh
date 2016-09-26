@@ -37,10 +37,9 @@ redis_file_name=${redis_pkg_name%.*}
 nginx_file_name=${nginx_pkg_name%.*}
 nginx_file_name=${nginx_file_name%.*}
 
-if [[ -d ${save_path} ]]
+if [[ ! -d ${save_path} ]]
 then
-    printf ${save_path} "is not a directory, please choose another directory or make the directory.\n";
-    exit 1;
+    mkdir ${save_path}
 else
     printf "begin to download installation packages.\n";
 fi

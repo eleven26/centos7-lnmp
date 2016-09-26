@@ -47,26 +47,32 @@ fi
 # mysql
 if [[ ! -f ${mysql_path} ]]
 then
+    printf "${mysql_path} doesn't exist, begin to download.\n"
     wget -O "${save_path}/${mysql_file_name}" ${mysql_pkg_url}
 fi
 
 # php
 if [[ ! -f ${php_path} ]]
 then
+    printf "${php_path} doesn't exist, begin to download.\n"
     wget -O "${save_path}/${php_file_name}" ${php_pkg_url}
 fi
 
 # nginx
 if [[ ! -f ${nginx_path} ]]
 then
+    printf "${nginx_path} doesn't exist, begin to download.\n"
     wget -O "${save_path}/${nginx_file_name}" ${nginx_pkg_url}
 fi
 
 # redis
 if [[ ! -f ${redis_path} ]]
 then
+    printf "${redis_path} doesn't exist, begin to download.\n"
     wget -O "${save_path}/${redis_file_name}" ${redis_pkg_url}
 fi
+
+# todo judge whether all the files are downloaded
 
 ########################################################################################################################
 # install mysql

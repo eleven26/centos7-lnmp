@@ -1,0 +1,12 @@
+[Unit]
+Description=php
+After=network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/php/sbin/php-fpm
+ExecReload=/usr/local/php/sbin/php-fpm restart
+ExecStop=/usr/local/php/sbin/php-fpm stop
+
+[Install]
+WantedBy=multi-user.target

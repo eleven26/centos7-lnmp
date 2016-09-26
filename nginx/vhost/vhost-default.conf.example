@@ -1,0 +1,24 @@
+server
+{
+    listen       80;
+    server_name boyu.kollway.com; #server_name end
+    index index.html index.htm index.php; #index end
+    set $subdomain '';
+    root  /wwwroot/boyu/public;
+    error_log logs/boyu.err.log;
+    include rewrite/laravel.conf;
+    location ~ .*\.php$
+    {
+        fastcgi_pass  127.0.0.1:9000;
+        fastcgi_index index.php;
+        include fastcgi.conf;
+    }
+    location ~ .*\.(gif|jpg|jpeg|png|bmp|swf|flv|mp3|wma)$
+    {
+        expires      30d;
+    }
+    location ~ .*\.(js|css)$
+    {
+        expires      12h;
+    }
+}

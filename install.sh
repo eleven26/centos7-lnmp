@@ -47,7 +47,7 @@ fi
 # mysql
 if [[ ! -f ${mysql_path} ]]
 then
-    wget -p ${save_path} ${mysql_pkg_url}
+    wget -O "${save_path}/${mysql_file_name}" ${mysql_pkg_url}
 fi
 
 # php
@@ -59,13 +59,13 @@ fi
 # nginx
 if [[ ! -f ${nginx_path} ]]
 then
-    wget -p ${save_path} ${nginx_pkg_url}
+    wget -O "${save_path}/${nginx_file_name}" ${nginx_pkg_url}
 fi
 
 # redis
 if [[ ! -f ${redis_path} ]]
 then
-    wget -p ${save_path} ${redis_pkg_url}
+    wget -O "${save_path}/${redis_file_name}" ${redis_pkg_url}
 fi
 
 ########################################################################################################################

@@ -14,7 +14,7 @@ yum -y install libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel
 
 
 centos_version=`hostnamectl | grep "Operating System" | awk '{print $5}'`
-if [[ $centos_version -ne 7 ]]
+if [[ ${centos_version} -ne 7 ]]
 then
     yum -y install libmcrypt-devel
 else

@@ -1,37 +1,11 @@
 #! /bin/sh
-
-# base dependency package
-yum -y install net-tools wget vim gcc git autoconf bzip2
-
-# mysql dependency package
-yum -y install libaio
-
-# nginx dependency package
-yum -y install pcre-devel zlib-devel
-
-# php dependency package
-yum -y install libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel
-
-
-centos_version=`hostnamectl | grep "Operating System" | awk '{print $5}'`
-if [[ $centos_version -ne 7 ]]
-then
-    yum -y install libmcrypt-devel
-else
-    # yum -y install libmcrypt-devel # doesn't work in centos7
-    # centos7 php openssl dependency package
-    yum -y install epel-release
-    yum -y install libmcrypt-devel.x86_64
-fi
-
-
 # NLS nuisances.
 LC_ALL=C
 export LC_ALL
 LANGUAGE=C
 export LANGUAGE
 
-shell_script_path=`pwd`
+shell_script_path=$(pwd)
 profile_file=/etc/profile
 service_path=/lib/systemc/system
 
@@ -51,10 +25,10 @@ redis_pkg_url=http://download.redis.io/redis-stable.tar.gz
 nginx_pkg_url=http://nginx.org/download/nginx-1.11.4.tar.gz
 
 # get file name with file extension
-mysql_pkg_name=`echo ${mysql_pkg_url} | awk -F '/' '{print $NF}'`
-php_pkg_name=`echo ${php_pkg_url} | awk -F '/' '{print $5}'`
-redis_pkg_name=`echo ${redis_pkg_url} | awk -F '/' '{print $NF}'`
-nginx_pkg_name=`echo ${nginx_pkg_url} | awk -F '/' '{print $NF}'`
+mysql_pkg_name=$(echo ${mysql_pkg_url} | awk -F '/' '{print $NF}')
+php_pkg_name=$(echo ${php_pkg_url} | awk -F '/' '{print $5}')
+redis_pkg_name=$(echo ${redis_pkg_url} | awk -F '/' '{print $NF}')
+nginx_pkg_name=$(echo ${nginx_pkg_url} | awk -F '/' '{print $NF}')
 
 # get file name without file extension
 mysql_file_name=${mysql_pkg_name%.*}

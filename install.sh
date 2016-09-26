@@ -222,6 +222,7 @@ cd ${shell_script_path}
 # install redis
 cd ${save_path}
 tar -xvf ${redis_pkg_name}
+redis_file_name=${redis_file_name%.*}
 cd ${redis_file_name}
 make
 make PREFIX=/usr/local/redis install

@@ -72,7 +72,34 @@ then
     wget -O "${save_path}/${redis_file_name}" ${redis_pkg_url}
 fi
 
-# todo judge whether all the files are downloaded
+# judge whether all the files are downloaded succeed
+# mysql
+if [[ ! -f ${mysql_path} ]]
+then
+    printf "download ${mysql_pkg_name} failed!"
+    exit 1
+fi
+
+# php
+if [[ ! -f ${php_path} ]]
+then
+    printf "download ${php_pkg_name} failed!"
+    exit 1
+fi
+
+# nginx
+if [[ ! -f ${nginx_path} ]]
+then
+    printf "download ${nginx_pkg_name} failed!"
+    exit 1
+fi
+
+# redis
+if [[ ! -f ${redis_path} ]]
+then
+    printf "download ${redis_pkg_name} failed!"
+    exit 1
+fi
 
 ########################################################################################################################
 # install mysql

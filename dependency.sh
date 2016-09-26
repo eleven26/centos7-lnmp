@@ -1,7 +1,7 @@
 #! /bin/sh
 
 # base dependency package
-yum -y install net-tools wget vim gcc
+yum -y install net-tools wget vim gcc git autoconf bzip2
 
 # mysql dependency package
 yum -y install libaio

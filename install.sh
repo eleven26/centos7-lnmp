@@ -221,14 +221,15 @@ printf "Complete mysql installation!\n The initial root password is ${root_pass}
 
 ########################################################################################################################
 # install nginx
-# cd ${save_path}
-
 tar -xvf ${nginx_path} -C ${save_path}
 # using absolute path instead enter the corresponding directory
+# we cannot use absolute path because nginx's configure file contains relative path
 nginx_work_directory=${save_path}/${nginx_directory}
-${nginx_work_directory}/configure --with-http_stub_status_module
-make -C ${nginx_work_directory}
-make install -C ${nginx_work_directory}
+
+cd ${nginx_work_directory}
+./configure --with-http_stub_status_module
+make
+make install
 
 # add bin to PATH
 ln -s /usr/local/nginx/sbin/nginx /usr/local/bin/
@@ -262,7 +263,7 @@ else
     printf message >> ${install_log}
 fi
 
-# cd ${shell_script_path}
+cd ${shell_script_path}
 ########################################################################################################################
 
 

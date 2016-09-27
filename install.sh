@@ -143,6 +143,8 @@ tar -xvf ${mysql_path} -C ${save_path}
 tar -xvf "${save_path}/${mysql_pkg_name}.gz" -C /usr/local
 ln -s "/usr/local/${mysql_directory}" /usr/local/mysql
 
+echo "mysql_directory: ${mysql_directory}.\n"
+
 printf "\n/usr/local/mysql/lib\n" >> /etc/ld.so.conf
 ldconfig -v
 

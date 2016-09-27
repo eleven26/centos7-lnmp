@@ -386,6 +386,10 @@ fi
 
 # add redis service
 cp ${shell_script_path}/systemd/redis.service ${service_path}
+if [[ -f ${service_path}/redis.service ]]; then
+    systemctl enable redis
+    systemctl start redis
+fi
 
 # install php redis extension
 cd ${shell_script_path}
@@ -403,6 +407,6 @@ if [[ -f /usr/local/php/etc/php.ini ]]; then
 fi
 
 systemctl restart php-fpm
-
+source ${profile_file}
 cd ${shell_script_path}
 ########################################################################################################################

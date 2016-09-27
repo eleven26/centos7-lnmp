@@ -61,7 +61,7 @@ function get_unpacked_name(){
 mysql_directory=`get_unpacked_name ${mysql_pkg_name}`
 php_directory=`get_unpacked_name ${php_pkg_name}`
 redis_directory=`get_unpacked_name ${redis_pkg_name}`
-nginx_directory=`get_unpacked_name ${redis_pkg_name}`
+nginx_directory=`get_unpacked_name ${nginx_pkg_name}`
 
 if [[ ! -d ${save_path} ]]
 then

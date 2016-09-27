@@ -43,21 +43,16 @@ function add_env() {
 # get the correct directory name after unpacked
 function get_unpacked_name(){
     filename=$1
+    extension="${filename##*.}"
     while true
     do
-        extension="${filename##*.}"
-        filename="${filename%.*}"
         if [[ ${extension} != "tar" && ${extension} != "gz" && ${extension} != "bz2" && ${extension} != "xz" ]]
         then
             echo "${filename}"
             return 0
         else
+            filename="${filename%.*}"
             extension="${filename##*.}"
-            if [[ ${extension} == ${filename} ]]
-            then
-                echo "${filename}"
-                return 0
-            fi
         fi
     done
 }

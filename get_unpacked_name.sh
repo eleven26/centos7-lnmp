@@ -1,21 +1,18 @@
 #!/usr/bin/env bash
 function get_unpacked_name(){
     filename=$1
+    extension="${filename##*.}"
     while true
     do
-        extension="${filename##*.}"
-        filename="${filename%.*}"
         if [[ ${extension} != "tar" && ${extension} != "gz" && ${extension} != "bz2" && ${extension} != "xz" ]]
         then
             echo "${filename}"
             return 0
         else
+            filename="${filename%.*}"
             extension="${filename##*.}"
-            if [[ ${extension} == ${filename} ]]
-            then
-                echo "${filename}"
-                return 0
-            fi
         fi
     done
 }
+
+echo `get_unpacked_name mysql-5.7.15-linux-glibc2.5-x86_64.tar.gz`

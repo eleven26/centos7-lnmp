@@ -166,6 +166,7 @@ make && make install
 
 # modify php.ini add redis.so
 if [[ -f /usr/local/php/etc/php.ini ]]; then
+    printf "Finishes install redis extension, now modify php.ini to add redis.so to extension. \n"
     sed -i "s/;extension=php_shmop.dll/;extension=php_shmop.dll\nextension=redis.so/g" /usr/local/php/etc/php.ini
 fi
 

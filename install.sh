@@ -35,9 +35,7 @@ nginx_pkg_name=$(echo ${nginx_pkg_url} | awk -F '/' '{print $NF}')
 # add some environment variable
 function add_env() {
     path=$1
-    profile=$2
     printf "\nexport PATH=$1:\$PATH\n" >> ${profile_file}
-    source ${profile_file}
     return 0
 }
 
@@ -202,6 +200,7 @@ printf "Begin to initializing mysql....\n"
 # add mysql bin to environment
 printf "\n"
 add_env /usr/local/mysql/bin
+source ${profile_file}
 
 if [[ -f ${shell_script_path}/systemd/mysql.service ]]; then
     systemctl enable mysql
@@ -234,6 +233,7 @@ make install
 ln -s /usr/local/nginx/sbin/nginx /usr/local/bin/
 if [[ ! -s /usr/local/bin/nginx ]]; then
     add_env /usr/local/nginx/bin
+    source ${profile_file}
 fi
 
 # nginx configuration
@@ -296,6 +296,7 @@ sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 50M/g" /usr/local/php/e
 # add environment variable
 printf "Add php bin to environment varionment."
 add_env /usr/local/php/bin:/usr/local/php/sbin
+source ${profile_file}
 
 # add user www and group www
 groupadd www
@@ -338,24 +339,29 @@ cd ${shell_script_path}
 # cd ${save_path}
 tar -xvf ${redis_path} -C ${save_path}
 redis_work_directory=${save_path}/${redis_directory}
-make -C ${redis_work_directory}
-make install -C ${redis_work_directory} PREFIX=/usr/local/redis install
+cd ${redis_work_directory}
+make
+make PREFIX=/usr/local/redis install
 
 add_env /usr/local/redis/bin
-if [[ -f ${redis_work_directory}redis.conf ]]; then
-    cp ${redis_work_directory}redis.conf /etc
+source ${profile_file}
+if [[ -f ${redis_work_directory}/redis.conf ]]; then
+    cp ${redis_work_directory}/redis.conf /etc
 else
     printf "Redis configuration file doesn't exist. please add it manually!\n"
 fi
 if [[ -f /etc/redis.conf ]]; then
     sed -i "s/daemonize no/daemonize yes/g" /etc/redis.conf
+else
+    printf "/etc/redis.conf doesn't exist! Redis installation may be failed. \n"
+    exit 1
 fi
 
 # add redis service
 cp ${shell_script_path}/systemd/redis.service ${service_path}
 
-
 # install php redis extension
+cd ${shell_script_path}
 git clone https://github.com/phpredis/phpredis.git
 cd phpredis
 git checkout -b php7 origin/php7
@@ -365,11 +371,11 @@ make && make install
 
 # modify php.ini add redis.so
 if [[ -f /usr/local/php/etc/php.ini ]]; then
+    printf "Finishes install redis extension, now modify php.ini to add redis.so to extension. \n"
     sed -i "s/;extension=php_shmop.dll/;extension=php_shmop.dll\nextension=redis.so/g" /usr/local/php/etc/php.ini
 fi
 
-
 systemctl restart php-fpm
-cd ${shell_script_path}
 
+cd ${shell_script_path}
 ########################################################################################################################

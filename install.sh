@@ -368,10 +368,8 @@ tar -xvf ${redis_path} -C ${save_path}
 redis_work_directory=${save_path}/${redis_directory}
 cd ${redis_work_directory}
 make
-make PREFIX=/usr/local/redis install
+make install
 
-add_env /usr/local/redis/bin
-source ${profile_file}
 if [[ -f ${redis_work_directory}/redis.conf ]]; then
     cp ${redis_work_directory}/redis.conf /etc
 else

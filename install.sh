@@ -197,6 +197,7 @@ chown -R mysql:mysql /usr/local/mysql
 printf "Begin to initializing mysql....\n"
 /usr/local/mysql/bin/mysqld --initialize --user=mysql > ~/mysql_initialize 2>&1
 # tail -1 ~/mysql_initialize | awk '{print $NF}'
+root_pass=$(`tail -1 ~/mysql_initialize | awk '{print $NF}'`)
 
 # add mysql bin to environment
 printf "\n"
@@ -209,6 +210,9 @@ else
     message="File ${shell_script_path}/systemd/mysql.service doesn't exist! We can not start the mysql service, you can add it manually."
     printf message
 fi
+
+printf "Complete mysql installation!\n The initial root password is ${root_pass}"
+
 #todo modify mysql root password using mysql script, before do that ensure mysqld service is started.
 
 # cd ${shell_script_path}

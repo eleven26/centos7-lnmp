@@ -36,7 +36,6 @@ nginx_pkg_name=$(echo ${nginx_pkg_url} | awk -F '/' '{print $NF}')
 function add_env() {
     path=$1
     printf "\nexport PATH=$1:\$PATH\n" >> ${profile_file}
-    source ${profile_file}
     return 0
 }
 
@@ -140,8 +139,9 @@ make
 make PREFIX=/usr/local/redis install
 
 add_env /usr/local/redis/bin
-if [[ -f ${redis_work_directory}redis.conf ]]; then
-    cp ${redis_work_directory}redis.conf /etc
+source ${profile_file}
+if [[ -f ${redis_work_directory}/redis.conf ]]; then
+    cp ${redis_work_directory}/redis.conf /etc
 else
     printf "Redis configuration file doesn't exist. please add it manually!\n"
 fi

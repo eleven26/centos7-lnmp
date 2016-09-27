@@ -140,7 +140,7 @@ ln -s "/usr/local/${mysql_directory}" /usr/local/mysql
 
 echo "mysql_directory: ${mysql_directory}.\n"
 
-printf "\n/usr/local/mysql/lib\n" >> /etc/ld.so.conf
+cat /etc/ld.so.conf | grep "/usr/local/mysql/lib" || printf "\n/usr/local/mysql/lib\n" >> /etc/ld.so.conf
 ldconfig -v
 
 if [[ ! -d /usr/local/${mysql_directory} ]]
@@ -259,7 +259,7 @@ tar -xvf ${php_path} -C ${save_path}
 libxml2_lib=/usr/include/libxml2/libxml
 if [[ -d ${libxml2_lib} ]]
 then
-    printf "\n${libxml2_lib}\n" >> /etc/ld.so.conf
+    cat /etc/ld.so.conf | grep "${libxml2_lib}" || printf "\n${libxml2_lib}\n" >> /etc/ld.so.conf
 fi
 ldconfig -v
 

@@ -35,6 +35,7 @@ nginx_pkg_name=$(echo ${nginx_pkg_url} | awk -F '/' '{print $NF}')
 # add some environment variable
 function add_env() {
     path=$1
+    profile=$2
     printf "\nexport PATH=$1:\$PATH\n" >> ${profile_file}
     source ${profile_file}
     return 0
@@ -197,7 +198,6 @@ chown -R mysql:mysql /usr/local/mysql
 printf "Begin to initializing mysql....\n"
 /usr/local/mysql/bin/mysqld --initialize --user=mysql > ~/mysql_initialize 2>&1
 # tail -1 ~/mysql_initialize | awk '{print $NF}'
-root_pass=$(`tail -1 ~/mysql_initialize | awk '{print $NF}'`)
 
 # add mysql bin to environment
 printf "\n"
@@ -210,17 +210,16 @@ else
     message="File ${shell_script_path}/systemd/mysql.service doesn't exist! We can not start the mysql service, you can add it manually."
     printf message
 fi
-
-printf "Complete mysql installation!\n The initial root password is ${root_pass}"
-
 #todo modify mysql root password using mysql script, before do that ensure mysqld service is started.
 
 # cd ${shell_script_path}
 ########################################################################################################################
 
 
-########################################################################################################################
+#########################################################################################################################
 # install nginx
+# cd ${save_path}
+
 tar -xvf ${nginx_path} -C ${save_path}
 # using absolute path instead enter the corresponding directory
 # we cannot use absolute path because nginx's configure file contains relative path
@@ -269,7 +268,6 @@ cd ${shell_script_path}
 
 ########################################################################################################################
 # install php, it will take a long time
-# cd ${save_path}
 
 tar -xvf ${php_path} -C ${save_path}
 libxml2_lib=/usr/include/libxml2/libxml
@@ -281,9 +279,10 @@ ldconfig -v
 
 php_work_directory=${save_path}/${php_directory}
 # configure
-${php_work_directory}/configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --with-mysql=/usr/local/mysql --with-mysqli=/usr/local/mysql/bin/mysql_config --with-iconv --with-freetype-dir --with-jpeg-dir --with-png-dir --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-discard-path --enable-safe-mode --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --with-curlwrappers --enable-mbregex --enable-fastcgi --enable-fpm --enable-force-cgi-redirect --enable-mbstring --with-mcrypt --with-gd --enable-gd-native-ttf --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-zip --enable-soap --without-pear --with-zlib --enable-pdo --with-pdo-mysql --enable-opcache
-make -C ${php_work_directory}
-make install -C ${php_work_directory}
+cd ${php_work_directory}
+./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --with-mysql=/usr/local/mysql --with-mysqli=/usr/local/mysql/bin/mysql_config --with-iconv --with-freetype-dir --with-jpeg-dir --with-png-dir --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-discard-path --enable-safe-mode --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --with-curlwrappers --enable-mbregex --enable-fastcgi --enable-fpm --enable-force-cgi-redirect --enable-mbstring --with-mcrypt --with-gd --enable-gd-native-ttf --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-zip --enable-soap --without-pear --with-zlib --enable-pdo --with-pdo-mysql --enable-opcache
+make
+make install
 
 if [[ ! -d /usr/local/php ]]; then
     printf "Install php failed!"
@@ -291,7 +290,7 @@ if [[ ! -d /usr/local/php ]]; then
 fi
 # php configuration
 printf "Configuring php...\n"
-cp /path/to/php-source/php.ini-development /usr/local/php/etc/php.ini
+cp ./php.ini-development /usr/local/php/etc/php.ini
 sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 50M/g" /usr/local/php/etc/php.ini
 
 # add environment variable
@@ -299,12 +298,19 @@ printf "Add php bin to environment varionment."
 add_env /usr/local/php/bin:/usr/local/php/sbin
 
 # add user www and group www
-grouped www
+groupadd www
 useradd -r -g www -s /bin/false www
 
 # php-fpm configuration
-cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
-cp /usr/local/php/etc/php-fpm.d/www.conf.default /usr/local/php/etc/php-fpm.d/www.conf
+php_fpm_conf=/usr/local/php/etc/php-fpm.conf.default
+fpm_www_conf=/usr/local/php/etc/php-fpm.d/www.conf.default
+if [[ ! -f ${php_fpm_conf} || ! -f ${fpm_www_conf} ]]; then
+    printf "php-fpm configuration file or php-fpm www.conf file doesn't exist! Php installation maybe failed.\n"
+    exit 1
+else
+    cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
+    cp /usr/local/php/etc/php-fpm.d/www.conf.default /usr/local/php/etc/php-fpm.d/www.conf
+fi
 
 if [[ ! -f /usr/local/php/etc/php-fpm.d/www.conf ]]; then
     message="/usr/local/php/etc/php-fpm.d/www.conf doesn't exist! Please configure the php-fpm manually!"
@@ -323,7 +329,7 @@ else
     systemctl enable php-fpm
     systemctl start php-fpm
 fi
-# cd ${shell_script_path}
+cd ${shell_script_path}
 ########################################################################################################################
 
 

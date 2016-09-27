@@ -35,6 +35,7 @@ nginx_pkg_name=$(echo ${nginx_pkg_url} | awk -F '/' '{print $NF}')
 # add some environment variable
 function add_env() {
     path=$1
+    profile=$2
     printf "\nexport PATH=$1:\$PATH\n" >> ${profile_file}
     source ${profile_file}
     return 0
@@ -162,7 +163,7 @@ printf "Add php bin to environment varionment."
 add_env /usr/local/php/bin:/usr/local/php/sbin
 
 # add user www and group www
-grouped www
+groupadd www
 useradd -r -g www -s /bin/false www
 
 # php-fpm configuration

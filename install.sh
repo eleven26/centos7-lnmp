@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/usr/bin/env bash
 # NLS nuisances.
 LC_ALL=C
 export LC_ALL

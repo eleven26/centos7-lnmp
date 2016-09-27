@@ -150,13 +150,14 @@ ldconfig -v
 
 if [[ ! -d /usr/local/${mysql_directory} ]]
 then
-    printf "Decompression ${mysql_pkg_name} failed! Installation was interrupted."
+    printf "/usr/local/${mysql_directory} doesn't exist.\n"
+    printf "Decompression ${mysql_pkg_name} failed! Installation was interrupted.\n"
     exit 2
 fi
 
 if [[ ! -s /usr/local/mysql ]]
 then
-    printf "Create soft link /usr/local/mysql failed! Installation was interrupted, you can create the soft link manually."
+    printf "Create soft link /usr/local/mysql failed! Installation was interrupted, you can create the soft link manually.\n"
     exit 2
 fi
 

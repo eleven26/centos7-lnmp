@@ -139,7 +139,7 @@ fi
 # install mysql
 # cd ${save_path}
 # use the absolute path instead of enter the save path
-tar -xvf ${mysql_path}
+tar -xvf ${mysql_path} -C ${save_path}
 tar -xvf "${save_path}/${mysql_pkg_name}.gz" -C /usr/local
 ln -s "/usr/local/${mysql_directory}" /usr/local/mysql
 
@@ -210,7 +210,7 @@ fi
 # install nginx
 # cd ${save_path}
 
-tar -xvf ${nginx_path}
+tar -xvf ${nginx_path} -C ${save_path}
 # using absolute path instead enter the corresponding directory
 nginx_work_directory=${save_path}/${nginx_directory}
 ${nginx_work_directory}/configure --with-http_stub_status_module
@@ -257,7 +257,7 @@ fi
 # install php, it will take a long time
 # cd ${save_path}
 
-tar -xvf ${php_path}
+tar -xvf ${php_path} -C ${save_path}
 libxml2_lib=/usr/include/libxml2/libxml
 if [[ -d ${libxml2_lib} ]]
 then
@@ -316,7 +316,7 @@ fi
 ########################################################################################################################
 # install redis
 # cd ${save_path}
-tar -xvf ${redis_path}
+tar -xvf ${redis_path} -C ${save_path}
 redis_work_directory=${save_path}/${redis_directory}
 ${redis_work_directory}/make
 ${redis_work_directory}/make PREFIX=/usr/local/redis install

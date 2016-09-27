@@ -7,7 +7,7 @@ export LANGUAGE
 
 shell_script_path=$(pwd)
 profile_file=/etc/profile
-service_path=/lib/systemc/system
+service_path=/lib/systemd/system
 
 save_path=/root/downloads
 package_prefix=/root/downloads
@@ -195,7 +195,7 @@ chown -R mysql:mysql /usr/local/mysql
 
 # attention: the next line will generate output in ~/mysql_initialize, the root's password will be appeared in that file
 printf "Begin to initializing mysql....\n"
-bin/mysqld --initialize --user=mysql > ~/mysql_initialize 2>&1
+/usr/local/mysql/bin/mysqld --initialize --user=mysql > ~/mysql_initialize 2>&1
 # tail -1 ~/mysql_initialize | awk '{print $NF}'
 
 # add mysql bin to environment

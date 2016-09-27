@@ -12,6 +12,8 @@ service_path=/lib/systemc/system
 save_path=/root/downloads
 package_prefix=/root/downloads
 
+install_log=install.log
+
 # if you have needed packages, type the path behind
 mysql_path=${package_prefix}/mysql-5.7.15-linux-glibc2.5-x86_64.tar
 php_path=${package_prefix}/php-7.0.11.tar.bz2
@@ -30,95 +32,155 @@ php_pkg_name=$(echo ${php_pkg_url} | awk -F '/' '{print $5}')
 redis_pkg_name=$(echo ${redis_pkg_url} | awk -F '/' '{print $NF}')
 nginx_pkg_name=$(echo ${nginx_pkg_url} | awk -F '/' '{print $NF}')
 
-# get file name without file extension
-mysql_file_name=${mysql_pkg_name%.*}
-php_file_name=${php_pkg_name%.*}
-redis_file_name=${redis_pkg_name%.*}
-nginx_file_name=${nginx_pkg_name%.*}
-nginx_file_name=${nginx_file_name%.*}
+# add some environment variable
+function add_env() {
+    path=$1
+    printf "\nexport PATH=$1:\$PATH\n" >> ${profile_file}
+    source ${profile_file}
+    return 0
+}
+
+# get the correct directory name after unpacked
+function get_unpacked_name(){
+    filename=$1
+    while true
+    do
+        extension="${filename##*.}"
+        filename="${filename%.*}"
+        if [[ ${extension} != "tar" && ${extension} != "gz" && ${extension} != "bz2" && ${extension} != "xz" ]]
+        then
+            echo "${filename}"
+            return 0
+        else
+            extension="${filename##*.}"
+            if [[ ${extension} == ${filename} ]]
+            then
+                echo "${filename}"
+                return 0
+            fi
+        fi
+    done
+}
+
+# get unpacked directory name not the full path, the installation will need these
+mysql_directory=`get_unpacked_name ${mysql_pkg_name}`
+php_directory=`get_unpacked_name ${php_pkg_name}`
+redis_directory=`get_unpacked_name ${redis_pkg_name}`
+nginx_directory=`get_unpacked_name ${redis_pkg_name}`
 
 if [[ ! -d ${save_path} ]]
 then
+    printf "The directory ${save_path} doesn't exist, now create it.\n"
     mkdir ${save_path}
+    printf "${save_path} created.\n"
 else
-    printf "begin to download installation packages.\n";
+    printf "Begin to check installation packages if exist...\n";
+    printf "If packages doesn't exist, it will be download from the internet.\n"
 fi
 
 # mysql
 if [[ ! -f ${mysql_path} ]]
 then
-    printf "${mysql_path} doesn't exist, begin to download.\n"
-    wget -O "${save_path}/${mysql_pkg_name}" ${mysql_pkg_url}
+    printf "${mysql_path} doesn't exist, begin to download....\n"
+    wget -O ${mysql_path} ${mysql_pkg_url}
 fi
 
 # php
 if [[ ! -f ${php_path} ]]
 then
-    printf "${php_path} doesn't exist, begin to download.\n"
-    wget -O "${save_path}/${php_pkg_name}" ${php_pkg_url}
+    printf "${php_path} doesn't exist, begin to download...\n"
+    wget -O ${php_path} ${php_pkg_url}
 fi
 
 # nginx
 if [[ ! -f ${nginx_path} ]]
 then
-    printf "${nginx_path} doesn't exist, begin to download.\n"
-    wget -O "${save_path}/${nginx_pkg_name}" ${nginx_pkg_url}
+    printf "${nginx_path} doesn't exist, begin to download...\n"
+    wget -O ${nginx_path} ${nginx_pkg_url}
 fi
 
 # redis
 if [[ ! -f ${redis_path} ]]
-then
-    printf "${redis_path} doesn't exist, begin to download.\n"
-    wget -O "${save_path}/${redis_pkg_name}" ${redis_pkg_url}
+thn
+    printf "${redis_path} doesn't exist, begin to download...\n"
+    wget -O ${redis_path} ${redis_pkg_url}
 fi
 
 # judge whether all the files are downloaded succeed
 # mysql
 if [[ ! -f ${mysql_path} ]]
 then
-    printf "download ${mysql_pkg_name} failed!"
+    printf "Download ${mysql_pkg_name} failed! please check if the given url is valid or check if the save path is valid."
     exit 1
 fi
 
 # php
 if [[ ! -f ${php_path} ]]
 then
-    printf "download ${php_pkg_name} failed!"
+    printf "Download ${php_pkg_name} failed! please check if the given url is valid or check if the save path is valid."
     exit 1
 fi
 
 # nginx
 if [[ ! -f ${nginx_path} ]]
 then
-    printf "download ${nginx_pkg_name} failed!"
+    printf "Download ${nginx_pkg_name} failed! please check if the given url is valid or check if the save path is valid."
     exit 1
 fi
 
 # redis
 if [[ ! -f ${redis_path} ]]
 then
-    printf "download ${redis_pkg_name} failed!"
+    printf "Download ${redis_pkg_name} failed! please check if the given url is valid or check if the save path is valid."
     exit 1
 fi
 
 ########################################################################################################################
 # install mysql
-cd ${save_path}
-
-tar -xvf ${mysql_pkg_name}
-tar -xvf "${mysql_pkg_name}.gz" -C /usr/local
-ln -s "/usr/local/${mysql_file_name}" /usr/local/mysql
+# cd ${save_path}
+# use the absolute path instead of enter the save path
+tar -xvf ${mysql_path}
+tar -xvf "${save_path}/${mysql_pkg_name}.gz" -C /usr/local
+ln -s "/usr/local/${mysql_directory}" /usr/local/mysql
 
 printf "\n/usr/local/mysql/lib\n" >> /etc/ld.so.conf
 ldconfig -v
 
+if [[ ! -d /usr/local/${mysql_directory} ]]
+then
+    printf "Decompression ${mysql_pkg_name} failed! Installation was interrupted."
+    exit 2
+fi
+
+if [[ ! -s /usr/local/mysql ]]
+then
+    printf "Create soft link /usr/local/mysql failed! Installation was interrupted, you can create the soft link manually."
+    exit 2
+fi
+
 # mysql configuration
-mkdir /usr/local/mysql/data
-cp ${shell_script_path}/mysql/my.cnf /etc
-cp ${shell_script_path}/systemd/mysql.service ${service_path}
+if [[ ! -d /usr/local/mysql/data ]]; then
+    mkdir /usr/local/mysql/data
+fi
+
+if [[ -f ${shell_script_path}/mysql/my.cnf ]]; then
+    cp ${shell_script_path}/mysql/my.cnf /etc
+else
+    message="${shell_script_path}/mysql/mysql.cnf doesn't exist!\n"
+    printf message
+    printf message >> ${install_log}
+fi
+
+if [[ -f ${shell_script_path}/systemd/mysql.service ]]; then
+    cp ${shell_script_path}/systemd/mysql.service ${service_path}
+else
+    message="${shell_script_path}/systemd/mysql.service doesn't exist!\n"
+    printf message
+    printf message >> ${install_log}
+fi
 
 # initialize mysql
-printf "now initializing mysql, after this finish, it will generate the initializing password for root\n"
+printf "Now initializing mysql, after this finishes, it will generate the initializing password for root\n"
 # add user and group
 groupadd mysql
 useradd -r -g mysql -s /bin/false mysql
@@ -128,28 +190,38 @@ chown -R mysql:mysql /usr/local/mysql
 bin/mysqld --initialize --user=mysql > ~/mysql_initialize 2>&1
 # tail -1 ~/mysql_initialize | awk '{print $NF}'
 
-# add mysql bin to PATH
-printf "\nexport PATH=/usr/local/mysql/bin:\$PATH\n" >> ${profile_file}
-source ${profile_file}
+# add mysql bin to environment
+add_env /usr/local/mysql/bin
 
-systemctl enable mysql
-systemctl start mysql
-#todo modify mysql root password
+if [[ -f ${shell_script_path}/systemd/mysql.service ]]; then
+    systemctl enable mysql
+    systemctl start mysql
+else
+    message="File ${shell_script_path}/systemd/mysql.service doesn't exist! We can not start the mysql service, you can add it manually."
+    printf message
+fi
+#todo modify mysql root password using mysql script, before do that ensure mysqld service is started.
 
-cd ${shell_script_path}
+# cd ${shell_script_path}
 ########################################################################################################################
 
 
 ########################################################################################################################
 # install nginx
-cd ${save_path}
+# cd ${save_path}
 
-tar -xvf ${nginx_pkg_name}
-cd ${nginx_file_name}
-./configure --with-http_stub_status_module  && make && make install
+tar -xvf ${nginx_path}
+# using absolute path instead enter the corresponding directory
+nginx_work_directory=${save_path}/${nginx_directory}
+${nginx_work_directory}/configure --with-http_stub_status_module
+${nginx_work_directory}/make
+${nginx_work_directory}/make install
 
 # add bin to PATH
 ln -s /usr/local/nginx/sbin/nginx /usr/local/bin/
+if [[ ! -s /usr/local/bin/nginx ]]; then
+    add_env /usr/local/nginx/bin
+fi
 
 # nginx configuration
 vhost_dir=/usr/local/nginx/conf/vhost
@@ -168,19 +240,24 @@ cp ${shell_script_path}/nginx/rewrite/laravel.conf /usr/local/nginx/rewrite
 
 # add nginx service
 cp ${shell_script_path}/systemd/nginx.service ${service_path}
-systemctl enable nginx
-systemctl start nginx
+if [[ -f ${shell_script_path}/systemd/nginx.service ]]; then
+    systemctl enable nginx
+    systemctl start nginx
+else
+    message="${shell_script_path}/systemd/nginx.service doesn't exist! We can not start the nginx's system service.\n"
+    printf message
+    printf message >> ${install_log}
+fi
 
-cd ${shell_script_path}
+# cd ${shell_script_path}
 ########################################################################################################################
 
 
 ########################################################################################################################
 # install php, it will take a long time
-cd ${save_path}
+# cd ${save_path}
 
-tar -xvf ${php_pkg_name}
-cd ${php_file_name}
+tar -xvf ${php_path}
 libxml2_lib=/usr/include/libxml2/libxml
 if [[ -d ${libxml2_lib} ]]
 then
@@ -188,17 +265,24 @@ then
 fi
 ldconfig -v
 
+php_work_directory=${save_path}/${php_directory}
 # configure
-./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --with-mysql=/usr/local/mysql --with-mysqli=/usr/local/mysql/bin/mysql_config --with-iconv --with-freetype-dir --with-jpeg-dir --with-png-dir --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-discard-path --enable-safe-mode --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --with-curlwrappers --enable-mbregex --enable-fastcgi --enable-fpm --enable-force-cgi-redirect --enable-mbstring --with-mcrypt --with-gd --enable-gd-native-ttf --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-zip --enable-soap --without-pear --with-zlib --enable-pdo --with-pdo-mysql --enable-opcache
-make && make install
+${php_work_directory}/configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --with-mysql=/usr/local/mysql --with-mysqli=/usr/local/mysql/bin/mysql_config --with-iconv --with-freetype-dir --with-jpeg-dir --with-png-dir --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-discard-path --enable-safe-mode --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --with-curlwrappers --enable-mbregex --enable-fastcgi --enable-fpm --enable-force-cgi-redirect --enable-mbstring --with-mcrypt --with-gd --enable-gd-native-ttf --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-zip --enable-soap --without-pear --with-zlib --enable-pdo --with-pdo-mysql --enable-opcache
+${php_work_directory}/make
+${php_work_directory}/make install
 
+if [[ ! -d /usr/local/php ]]; then
+    printf "Install php failed!"
+    exit 1
+fi
 # php configuration
+printf "Configuring php...\n"
 cp /path/to/php-source/php.ini-development /usr/local/php/etc/php.ini
 sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 50M/g" /usr/local/php/etc/php.ini
 
 # add environment variable
-printf "\nexport PATH=/usr/local/php/bin:/usr/local/php/sbin:\$PATH\n" >> ${profile_file}
-source ${profile_file}
+printf "Add php bin to environment varionment."
+add_env /usr/local/php/bin:/usr/local/php/sbin
 
 # add user www and group www
 grouped www
@@ -208,33 +292,47 @@ useradd -r -g www -s /bin/false www
 cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
 cp /usr/local/php/etc/php-fpm.d/www.conf.default /usr/local/php/etc/php-fpm.d/www.conf
 
-sed -i "s/user = nobody/user = www/g" /usr/local/php/etc/php-fpm.d/www.conf
-sed -i "s/group = nobody/group = www/g" /usr/local/php/etc/php-fpm.d/www.conf
+if [[ ! -f /usr/local/php/etc/php-fpm.d/www.conf ]]; then
+    message="/usr/local/php/etc/php-fpm.d/www.conf doesn't exist! Please configure the php-fpm manually!"
+    printf ${message}
+else
+    printf "Now modify www.conf to change user and group from nobody to www...\n"
+    sed -i "s/user = nobody/user = www/g" /usr/local/php/etc/php-fpm.d/www.conf
+    sed -i "s/group = nobody/group = www/g" /usr/local/php/etc/php-fpm.d/www.conf
+fi
 
 # add php-fpm service
 cp ${shell_script_path}/systemd/php-fpm.service ${service_path}
-
-cd ${shell_script_path}
+if [[ ! -f ${shell_script_path}/systemd/php-fpm.service ]]; then
+    printf "${shell_script_path}/systemd/php-fpm.service doesn't exist.\n We can not start php-fpm service!\n"
+else
+    systemctl enable php-fpm
+    systemctl start php-fpm
+fi
+# cd ${shell_script_path}
 ########################################################################################################################
 
 
 ########################################################################################################################
 # install redis
-cd ${save_path}
-tar -xvf ${redis_pkg_name}
-redis_file_name=${redis_file_name%.*}
-cd ${redis_file_name}
-make
-make PREFIX=/usr/local/redis install
-printf "\nexport PATH=/usr/local/redis/bin:\$PATH" >> ${profile_file}
-source ${profile_file}
-cp redis.conf /etc
-sed -i "s/daemonize no/daemonize yes/g" /etc/redis.conf
+# cd ${save_path}
+tar -xvf ${redis_path}
+redis_work_directory=${save_path}/${redis_directory}
+${redis_work_directory}/make
+${redis_work_directory}/make PREFIX=/usr/local/redis install
+add_env /usr/local/redis/bin
+if [[ -f ${redis_work_directory}redis.conf ]]; then
+    cp ${redis_work_directory}redis.conf /etc
+else
+    printf "Redis configuration file doesn't exist. please add it manually!\n"
+fi
+if [[ -f /etc/redis.conf ]]; then
+    sed -i "s/daemonize no/daemonize yes/g" /etc/redis.conf
+fi
 
 # add redis service
 cp ${shell_script_path}/systemd/redis.service ${service_path}
 
-cd ${save_path}
 
 # install php redis extension
 git clone https://github.com/phpredis/phpredis.git
@@ -245,9 +343,12 @@ phpize
 make && make install
 
 # modify php.ini add redis.so
-sed -i "s/;extension=php_shmop.dll/;extension=php_shmop.dll\nextension=redis.so/g" /usr/local/php/etc/php.ini
-systemctl restart php-fpm
+if [[ -f /usr/local/php/etc/php.ini ]]; then
+    sed -i "s/;extension=php_shmop.dll/;extension=php_shmop.dll\nextension=redis.so/g" /usr/local/php/etc/php.ini
+fi
 
-cd ${shell_script_path}
+
+systemctl restart php-fpm
+# cd ${shell_script_path}
 
 ########################################################################################################################

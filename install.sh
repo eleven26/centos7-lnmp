@@ -101,7 +101,7 @@ fi
 
 # redis
 if [[ ! -f ${redis_path} ]]
-thn
+then
     printf "${redis_path} doesn't exist, begin to download...\n"
     wget -O ${redis_path} ${redis_pkg_url}
 fi

@@ -134,12 +134,16 @@ fi
 # install mysql
 # cd ${save_path}
 # use the absolute path instead of enter the save path
+printf "Decompressing ${mysql_path} to ${save_path}....\n"
 tar -xvf ${mysql_path} -C ${save_path}
+
+printf "Decompressing ${save_path}/${mysql_pkg_name}.gz to /usr/local\n"
 tar -xvf "${save_path}/${mysql_pkg_name}.gz" -C /usr/local
+
+printf "Creating mysql soft link.\n"
 ln -s "/usr/local/${mysql_directory}" /usr/local/mysql
 
-echo "mysql_directory: ${mysql_directory}.\n"
-
+printf "Adding mysql lib to /etc/ld.so.conf.\n"
 cat /etc/ld.so.conf | grep "/usr/local/mysql/lib" || printf "\n/usr/local/mysql/lib\n" >> /etc/ld.so.conf
 ldconfig -v
 
@@ -158,10 +162,12 @@ fi
 
 # mysql configuration
 if [[ ! -d /usr/local/mysql/data ]]; then
+    printf "Mysql data directory doesn't exist. Creating directory /usr/local/mysql/data....\n"
     mkdir /usr/local/mysql/data
 fi
 
 if [[ -f ${shell_script_path}/mysql/my.cnf ]]; then
+    printf "Copy mysql configuration file to /etc...\n"
     cp ${shell_script_path}/mysql/my.cnf /etc
 else
     message="${shell_script_path}/mysql/mysql.cnf doesn't exist!\n"
@@ -170,6 +176,7 @@ else
 fi
 
 if [[ -f ${shell_script_path}/systemd/mysql.service ]]; then
+    printf "Copy mysql service file to ${service_path}, so that mysql can run as a system's service...\n"
     cp ${shell_script_path}/systemd/mysql.service ${service_path}
 else
     message="${shell_script_path}/systemd/mysql.service doesn't exist!\n"
@@ -180,15 +187,19 @@ fi
 # initialize mysql
 printf "Now initializing mysql, after this finishes, it will generate the initializing password for root\n"
 # add user and group
+printf "Adding user mysql and group mysql...\n"
 groupadd mysql
 useradd -r -g mysql -s /bin/false mysql
+printf "Changing mysql directory owned by mysql...\n"
 chown -R mysql:mysql /usr/local/mysql
 
 # attention: the next line will generate output in ~/mysql_initialize, the root's password will be appeared in that file
+printf "Begin to initializing mysql....\n"
 bin/mysqld --initialize --user=mysql > ~/mysql_initialize 2>&1
 # tail -1 ~/mysql_initialize | awk '{print $NF}'
 
 # add mysql bin to environment
+printf "\n"
 add_env /usr/local/mysql/bin
 
 if [[ -f ${shell_script_path}/systemd/mysql.service ]]; then
@@ -212,8 +223,8 @@ tar -xvf ${nginx_path} -C ${save_path}
 # using absolute path instead enter the corresponding directory
 nginx_work_directory=${save_path}/${nginx_directory}
 ${nginx_work_directory}/configure --with-http_stub_status_module
-${nginx_work_directory}/make
-${nginx_work_directory}/make install
+make -C ${nginx_work_directory}
+make install -C ${nginx_work_directory}
 
 # add bin to PATH
 ln -s /usr/local/nginx/sbin/nginx /usr/local/bin/
@@ -266,8 +277,8 @@ ldconfig -v
 php_work_directory=${save_path}/${php_directory}
 # configure
 ${php_work_directory}/configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --with-mysql=/usr/local/mysql --with-mysqli=/usr/local/mysql/bin/mysql_config --with-iconv --with-freetype-dir --with-jpeg-dir --with-png-dir --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-discard-path --enable-safe-mode --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --with-curlwrappers --enable-mbregex --enable-fastcgi --enable-fpm --enable-force-cgi-redirect --enable-mbstring --with-mcrypt --with-gd --enable-gd-native-ttf --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-zip --enable-soap --without-pear --with-zlib --enable-pdo --with-pdo-mysql --enable-opcache
-${php_work_directory}/make
-${php_work_directory}/make install
+make -C ${php_work_directory}
+make install -C ${php_work_directory}
 
 if [[ ! -d /usr/local/php ]]; then
     printf "Install php failed!"
@@ -316,8 +327,9 @@ fi
 # cd ${save_path}
 tar -xvf ${redis_path} -C ${save_path}
 redis_work_directory=${save_path}/${redis_directory}
-${redis_work_directory}/make
-${redis_work_directory}/make PREFIX=/usr/local/redis install
+make -C ${redis_work_directory}
+make install -C ${redis_work_directory} PREFIX=/usr/local/redis install
+
 add_env /usr/local/redis/bin
 if [[ -f ${redis_work_directory}redis.conf ]]; then
     cp ${redis_work_directory}redis.conf /etc
@@ -347,6 +359,6 @@ fi
 
 
 systemctl restart php-fpm
-# cd ${shell_script_path}
+cd ${shell_script_path}
 
 ########################################################################################################################

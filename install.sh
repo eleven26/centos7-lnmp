@@ -54,6 +54,7 @@ mysql_pkg_url=http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.15-linux-gl
 php_pkg_url=http://cn2.php.net/get/php-7.0.11.tar.bz2/from/this/mirror
 redis_pkg_url=http://download.redis.io/redis-stable.tar.gz
 nginx_pkg_url=http://nginx.org/download/nginx-1.11.4.tar.gz
+phpredis_pkg_url=https://github.com/phpredis/phpredis.git
 
 # get file name with file extension
 mysql_pkg_name=$(echo ${mysql_pkg_url} | awk -F '/' '{print $NF}')
@@ -69,8 +70,8 @@ function add_env() {
 
 # get the correct directory name after unpacked
 function get_unpacked_name(){
-    filename=$1
-    extension="${filename##*.}"
+    local filename=$1
+    local extension="${filename##*.}"
     while true
     do
         if [[ ${extension} != "tar" && ${extension} != "gz" && ${extension} != "bz2" && ${extension} != "xz" ]]
@@ -89,6 +90,7 @@ mysql_directory=$(get_unpacked_name "${mysql_pkg_name}")
 php_directory=$(get_unpacked_name "${php_pkg_name}")
 redis_directory=$(get_unpacked_name "${redis_pkg_name}")
 nginx_directory=$(get_unpacked_name "${nginx_pkg_name}")
+phpredis_directory=${save_path}/phpredis
 
 if [[ ! -d ${save_path} ]]
 then
@@ -128,6 +130,12 @@ then
     wget -O ${redis_path} ${redis_pkg_url}
 fi
 
+# phpredis
+if [[ ! -d ${phpredis_directory} ]]
+then
+    git clone ${phpredis_pkg_url} ${phpredis_directory}
+fi
+
 # judge whether all the files are downloaded succeed
 # mysql
 if [[ ! -f ${mysql_path} ]]
@@ -154,6 +162,13 @@ fi
 if [[ ! -f ${redis_path} ]]
 then
     printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${redis_pkg_name}"
+    exit 1
+fi
+
+# phpredis
+if [[ ! -d ${phpredis_directory} ]]
+then
+    printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${phpredis_directory}"
     exit 1
 fi
 
@@ -401,12 +416,8 @@ if [[ -f ${service_path}/redis.service ]]; then
 fi
 
 # install php redis extension
-printf "Exit the script if directory %s doesn't exist.\n" "${shell_script_path}"
-cd "${shell_script_path}" || exit 1
-git clone https://github.com/phpredis/phpredis.git
-#todo download before installation
 printf "Exit the script if phpredis can not downloaded succeefully.\n"
-cd phpredis || exit 1
+cd "${phpredis_directory}" || exit 1
 git checkout -b php7 origin/php7
 phpize
 ./configure --with-php-config=php-config

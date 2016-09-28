@@ -2,6 +2,9 @@
 
 set -x
 
+# todo write configuration in the beginning
+# todo write php configuration option in the beginning
+
 ########################################################################################################################
 # base dependency package
 # yum -y install net-tools wget vim gcc git autoconf bzip2

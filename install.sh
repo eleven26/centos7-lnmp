@@ -92,6 +92,11 @@ redis_directory=$(get_unpacked_name "${redis_pkg_name}")
 nginx_directory=$(get_unpacked_name "${nginx_pkg_name}")
 phpredis_directory=${save_path}/phpredis
 
+mysql_install_dir=/usr/local/mysql
+php_install_dir=/usr/local/php
+redis_install_dir=/usr/local/redis
+nginx_install_dir=/usr/local/nginx
+
 if [[ ! -d ${save_path} ]]
 then
     printf "The directory %s doesn't exist, now create it.\n" "${save_path}"
@@ -176,82 +181,85 @@ fi
 # install mysql
 # cd ${save_path}
 # use the absolute path instead of enter the save path
-printf "Decompressing %s to %s....\n" "${mysql_path}" "${save_path}"
-tar -xvf ${mysql_path} -C ${save_path}
-
-printf "Decompressing %s/%s.gz to /usr/local\n" "${save_path}" "${mysql_pkg_name}"
-tar -xvf "${save_path}/${mysql_pkg_name}.gz" -C /usr/local
-
-printf "Creating mysql soft link.\n"
-ln -s "/usr/local/${mysql_directory}" /usr/local/mysql
-
-printf "Adding mysql lib to /etc/ld.so.conf.\n"
-grep "/usr/local/mysql/lib" /etc/ld.so.conf || printf "\n/usr/local/mysql/lib\n" >> /etc/ld.so.conf
-ldconfig -v
-
-if [[ ! -d /usr/local/${mysql_directory} ]]
+if [[ ! -d ${mysql_install_dir} ]]
 then
-    printf "/usr/local/%s doesn't exist.\n" "${mysql_directory}"
-    printf "Decompression %s failed! Installation was interrupted.\n" "${mysql_pkg_name}"
-    exit 2
-fi
+    printf "Decompressing %s to %s....\n" "${mysql_path}" "${save_path}"
+    tar -xvf ${mysql_path} -C ${save_path}
 
-if [[ ! -s /usr/local/mysql ]]
-then
-    printf "Create soft link /usr/local/mysql failed! Installation was interrupted, you can create the soft link manually.\n"
-    exit 2
-fi
+    printf "Decompressing %s/%s.gz to /usr/local\n" "${save_path}" "${mysql_pkg_name}"
+    tar -xvf "${save_path}/${mysql_pkg_name}.gz" -C /usr/local
 
-# mysql configuration
-if [[ ! -d /usr/local/mysql/data ]]; then
-    printf "Mysql data directory doesn't exist. Creating directory /usr/local/mysql/data....\n"
-    mkdir /usr/local/mysql/data
-fi
+    printf "Creating mysql soft link.\n"
+    ln -s "/usr/local/${mysql_directory}" /usr/local/mysql
 
-if [[ -f ${shell_script_path}/mysql/my.cnf ]]; then
-    printf "Copy mysql configuration file to /etc...\n"
-    cp "${shell_script_path}/mysql/my.cnf" /etc
-else
-    message="${shell_script_path}/mysql/mysql.cnf doesn't exist!\n"
-    printf message
-    printf message >> ${install_log}
-fi
+    printf "Adding mysql lib to /etc/ld.so.conf.\n"
+    grep "/usr/local/mysql/lib" /etc/ld.so.conf || printf "\n/usr/local/mysql/lib\n" >> /etc/ld.so.conf
+    ldconfig -v
 
-if [[ -f ${shell_script_path}/systemd/mysql.service ]]; then
-    printf "Copy mysql service file to %s, so that mysql can run as a system's service...\n" "${service_path}"
-    cp "${shell_script_path}/systemd/mysql.service" ${service_path}
-else
-    message="${shell_script_path}/systemd/mysql.service doesn't exist!\n"
-    printf message
-    printf message >> ${install_log}
-fi
+    if [[ ! -d /usr/local/${mysql_directory} ]]
+    then
+        printf "/usr/local/%s doesn't exist.\n" "${mysql_directory}"
+        printf "Decompression %s failed! Installation was interrupted.\n" "${mysql_pkg_name}"
+        exit 2
+    fi
 
-# initialize mysql
-printf "Now initializing mysql, after this finishes, it will generate the initializing password for root\n"
-# add user and group
-printf "Adding user mysql and group mysql...\n"
-groupadd mysql
-useradd -r -g mysql -s /bin/false mysql
-printf "Changing mysql directory owned by mysql...\n"
-chown -R mysql:mysql /usr/local/mysql
+    if [[ ! -s /usr/local/mysql ]]
+    then
+        printf "Create soft link /usr/local/mysql failed! Installation was interrupted, you can create the soft link manually.\n"
+        exit 2
+    fi
 
-# attention: the next line will generate output in ~/mysql_initialize, the root's password will be appeared in that file
-printf "Begin to initializing mysql....\n"
-/usr/local/mysql/bin/mysqld --initialize --user=mysql > ~/mysql_initialize 2>&1
-# tail -1 ~/mysql_initialize | awk '{print $NF}'
+    # mysql configuration
+    if [[ ! -d /usr/local/mysql/data ]]; then
+        printf "Mysql data directory doesn't exist. Creating directory /usr/local/mysql/data....\n"
+        mkdir /usr/local/mysql/data
+    fi
 
-# add mysql bin to environment
-printf "\n"
-add_env /usr/local/mysql/bin
-# shellcheck source=/dev/null
-source ${profile_file}
+    if [[ -f ${shell_script_path}/mysql/my.cnf ]]; then
+        printf "Copy mysql configuration file to /etc...\n"
+        cp "${shell_script_path}/mysql/my.cnf" /etc
+    else
+        message="${shell_script_path}/mysql/mysql.cnf doesn't exist!\n"
+        printf message
+        printf message >> ${install_log}
+    fi
 
-if [[ -f ${shell_script_path}/systemd/mysql.service ]]; then
-    systemctl enable mysql
-    systemctl start mysql
-else
-    message="File ${shell_script_path}/systemd/mysql.service doesn't exist! We can not start the mysql service, you can add it manually."
-    printf message
+    if [[ -f ${shell_script_path}/systemd/mysql.service ]]; then
+        printf "Copy mysql service file to %s, so that mysql can run as a system's service...\n" "${service_path}"
+        cp "${shell_script_path}/systemd/mysql.service" ${service_path}
+    else
+        message="${shell_script_path}/systemd/mysql.service doesn't exist!\n"
+        printf message
+        printf message >> ${install_log}
+    fi
+
+    # initialize mysql
+    printf "Now initializing mysql, after this finishes, it will generate the initializing password for root\n"
+    # add user and group
+    printf "Adding user mysql and group mysql...\n"
+    groupadd mysql
+    useradd -r -g mysql -s /bin/false mysql
+    printf "Changing mysql directory owned by mysql...\n"
+    chown -R mysql:mysql /usr/local/mysql
+
+    # attention: the next line will generate output in ~/mysql_initialize, the root's password will be appeared in that file
+    printf "Begin to initializing mysql....\n"
+    /usr/local/mysql/bin/mysqld --initialize --user=mysql > ~/mysql_initialize 2>&1
+    # tail -1 ~/mysql_initialize | awk '{print $NF}'
+
+    # add mysql bin to environment
+    printf "\n"
+    add_env /usr/local/mysql/bin
+    # shellcheck source=/dev/null
+    source ${profile_file}
+
+    if [[ -f ${shell_script_path}/systemd/mysql.service ]]; then
+        systemctl enable mysql
+        systemctl start mysql
+    else
+        message="File ${shell_script_path}/systemd/mysql.service doesn't exist! We can not start the mysql service, you can add it manually."
+        printf message
+    fi
 fi
 #todo modify mysql root password using mysql script, before do that ensure mysqld service is started.
 
@@ -262,50 +270,52 @@ fi
 #########################################################################################################################
 # install nginx
 # cd ${save_path}
-
-tar -xvf ${nginx_path} -C ${save_path}
-# using absolute path instead enter the corresponding directory
-# we cannot use absolute path because nginx's configure file contains relative path
-nginx_work_directory=${save_path}/${nginx_directory}
-
-printf "Exit script if %s doesn't exist." "${nginx_work_directory}"
-cd "${nginx_work_directory}" || exit 1
-./configure --with-http_stub_status_module
-make
-make install
-
-# add bin to PATH
-ln -s /usr/local/nginx/sbin/nginx /usr/local/bin/
-if [[ ! -s /usr/local/bin/nginx ]]; then
-    add_env /usr/local/nginx/bin
-    # shellcheck source=/dev/null
-    source ${profile_file}
-fi
-
-# nginx configuration
-vhost_dir=/usr/local/nginx/conf/vhost
-if [[ ! -d ${vhost_dir} ]]
+if [[ ! -d ${nginx_install_dir} ]]
 then
-    mkdir ${vhost_dir}
-fi
-# add vhost example
-cp "${shell_script_path}/nginx/vhost/vhost-default.conf.example" /usr/local/nginx/vhost
-rewrite_dir=/usr/local/nginx/conf/rewrite
-if [[ ! -d ${rewrite_dir} ]]
-then
-    mkdir ${rewrite_dir}
-fi
-cp "${shell_script_path}/nginx/rewrite/laravel.conf" /usr/local/nginx/rewrite
+    tar -xvf ${nginx_path} -C ${save_path}
+    # using absolute path instead enter the corresponding directory
+    # we cannot use absolute path because nginx's configure file contains relative path
+    nginx_work_directory=${save_path}/${nginx_directory}
 
-# add nginx service
-cp "${shell_script_path}/systemd/nginx.service" ${service_path}
-if [[ -f ${shell_script_path}/systemd/nginx.service ]]; then
-    systemctl enable nginx
-    systemctl start nginx
-else
-    message="${shell_script_path}/systemd/nginx.service doesn't exist! We can not start the nginx's system service.\n"
-    printf message
-    printf message >> ${install_log}
+    printf "Exit script if %s doesn't exist." "${nginx_work_directory}"
+    cd "${nginx_work_directory}" || exit 1
+    ./configure --with-http_stub_status_module
+    make
+    make install
+
+    # add bin to PATH
+    ln -s /usr/local/nginx/sbin/nginx /usr/local/bin/
+    if [[ ! -s /usr/local/bin/nginx ]]; then
+        add_env /usr/local/nginx/bin
+        # shellcheck source=/dev/null
+        source ${profile_file}
+    fi
+
+    # nginx configuration
+    vhost_dir=/usr/local/nginx/conf/vhost
+    if [[ ! -d ${vhost_dir} ]]
+    then
+        mkdir ${vhost_dir}
+    fi
+    # add vhost example
+    cp "${shell_script_path}/nginx/vhost/vhost-default.conf.example" /usr/local/nginx/vhost
+    rewrite_dir=/usr/local/nginx/conf/rewrite
+    if [[ ! -d ${rewrite_dir} ]]
+    then
+        mkdir ${rewrite_dir}
+    fi
+    cp "${shell_script_path}/nginx/rewrite/laravel.conf" /usr/local/nginx/rewrite
+
+    # add nginx service
+    cp "${shell_script_path}/systemd/nginx.service" ${service_path}
+    if [[ -f ${shell_script_path}/systemd/nginx.service ]]; then
+        systemctl enable nginx
+        systemctl start nginx
+    else
+        message="${shell_script_path}/systemd/nginx.service doesn't exist! We can not start the nginx's system service.\n"
+        printf message
+        printf message >> ${install_log}
+    fi
 fi
 
 printf "Exit the script if %s doesn't exist.\n" "${shell_script_path}"
@@ -315,69 +325,71 @@ cd "${shell_script_path}" || exit 1
 
 ########################################################################################################################
 # install php, it will take a long time
-
-tar -xvf ${php_path} -C ${save_path}
-libxml2_lib=/usr/include/libxml2/libxml
-if [[ -d ${libxml2_lib} ]]
+if [[ ! -d ${php_install_dir} ]]
 then
-    grep "${libxml2_lib}" /etc/ld.so.conf || printf "\n%s\n" "${libxml2_lib}" >> /etc/ld.so.conf
-fi
-ldconfig -v
+    tar -xvf ${php_path} -C ${save_path}
+    libxml2_lib=/usr/include/libxml2/libxml
+    if [[ -d ${libxml2_lib} ]]
+    then
+        grep "${libxml2_lib}" /etc/ld.so.conf || printf "\n%s\n" "${libxml2_lib}" >> /etc/ld.so.conf
+    fi
+    ldconfig -v
 
-php_work_directory=${save_path}/${php_directory}
-# configure
-printf "Exit the script if directory %s doesn't exist.\n" "${php_work_directory}"
-cd "${php_work_directory}" || exit 4
-./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --with-mysql=/usr/local/mysql --with-mysqli=/usr/local/mysql/bin/mysql_config --with-iconv --with-freetype-dir --with-jpeg-dir --with-png-dir --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-discard-path --enable-safe-mode --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --with-curlwrappers --enable-mbregex --enable-fastcgi --enable-fpm --enable-force-cgi-redirect --enable-mbstring --with-mcrypt --with-gd --enable-gd-native-ttf --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-zip --enable-soap --without-pear --with-zlib --enable-pdo --with-pdo-mysql --enable-opcache
-make
-make install
+    php_work_directory=${save_path}/${php_directory}
+    # configure
+    printf "Exit the script if directory %s doesn't exist.\n" "${php_work_directory}"
+    cd "${php_work_directory}" || exit 4
+    ./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --with-mysql=/usr/local/mysql --with-mysqli=/usr/local/mysql/bin/mysql_config --with-iconv --with-freetype-dir --with-jpeg-dir --with-png-dir --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-discard-path --enable-safe-mode --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --with-curlwrappers --enable-mbregex --enable-fastcgi --enable-fpm --enable-force-cgi-redirect --enable-mbstring --with-mcrypt --with-gd --enable-gd-native-ttf --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-zip --enable-soap --without-pear --with-zlib --enable-pdo --with-pdo-mysql --enable-opcache
+    make
+    make install
 
-if [[ ! -d /usr/local/php ]]; then
-    printf "Install php failed!"
-    exit 1
-fi
-# php configuration
-printf "Configuring php...\n"
-cp ./php.ini-development /usr/local/php/etc/php.ini
-sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 50M/g" /usr/local/php/etc/php.ini
+    if [[ ! -d /usr/local/php ]]; then
+        printf "Install php failed!"
+        exit 1
+    fi
+    # php configuration
+    printf "Configuring php...\n"
+    cp ./php.ini-development /usr/local/php/etc/php.ini
+    sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 50M/g" /usr/local/php/etc/php.ini
 
-# add environment variable
-printf "Add php bin to environment varionment."
-add_env /usr/local/php/bin:/usr/local/php/sbin
-# shellcheck source=/dev/null
-source ${profile_file}
+    # add environment variable
+    printf "Add php bin to environment varionment."
+    add_env /usr/local/php/bin:/usr/local/php/sbin
+    # shellcheck source=/dev/null
+    source ${profile_file}
 
-# add user www and group www
-groupadd www
-useradd -r -g www -s /bin/false www
+    # add user www and group www
+    groupadd www
+    useradd -r -g www -s /bin/false www
 
-# php-fpm configuration
-php_fpm_conf=/usr/local/php/etc/php-fpm.conf.default
-fpm_www_conf=/usr/local/php/etc/php-fpm.d/www.conf.default
-if [[ ! -f ${php_fpm_conf} || ! -f ${fpm_www_conf} ]]; then
-    printf "php-fpm configuration file or php-fpm www.conf file doesn't exist! Php installation maybe failed.\n"
-    exit 1
-else
-    cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
-    cp /usr/local/php/etc/php-fpm.d/www.conf.default /usr/local/php/etc/php-fpm.d/www.conf
-fi
+    # php-fpm configuration
+    php_fpm_conf=/usr/local/php/etc/php-fpm.conf.default
+    fpm_www_conf=/usr/local/php/etc/php-fpm.d/www.conf.default
+    if [[ ! -f ${php_fpm_conf} || ! -f ${fpm_www_conf} ]]; then
+        printf "php-fpm configuration file or php-fpm www.conf file doesn't exist! Php installation maybe failed.\n"
+        exit 1
+    else
+        cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
+        cp /usr/local/php/etc/php-fpm.d/www.conf.default /usr/local/php/etc/php-fpm.d/www.conf
+    fi
 
-if [[ ! -f /usr/local/php/etc/php-fpm.d/www.conf ]]; then
-    message="/usr/local/php/etc/php-fpm.d/www.conf doesn't exist! Please configure the php-fpm manually!"
-    printf "%s" "${message}"
-else
-    printf "Now modify www.conf to change user and group from nobody to www...\n"
-    sed -i "s/user = nobody/user = www/g" /usr/local/php/etc/php-fpm.d/www.conf
-    sed -i "s/group = nobody/group = www/g" /usr/local/php/etc/php-fpm.d/www.conf
-fi
+    if [[ ! -f /usr/local/php/etc/php-fpm.d/www.conf ]]; then
+        message="/usr/local/php/etc/php-fpm.d/www.conf doesn't exist! Please configure the php-fpm manually!"
+        printf "%s" "${message}"
+    else
+        printf "Now modify www.conf to change user and group from nobody to www...\n"
+        sed -i "s/user = nobody/user = www/g" /usr/local/php/etc/php-fpm.d/www.conf
+        sed -i "s/group = nobody/group = www/g" /usr/local/php/etc/php-fpm.d/www.conf
+    fi
 
-# add php-fpm service
-cp "${shell_script_path}/systemd/php-fpm.service" ${service_path}
-if [[ ! -f ${shell_script_path}/systemd/php-fpm.service ]]; then
-    printf "%s/systemd/php-fpm.service doesn't exist.\n We can not start php-fpm service!\n" "${shell_script_path}"
-else
-    systemctl enable php-fpm
-    systemctl start php-fpm
+    # add php-fpm service
+    cp "${shell_script_path}/systemd/php-fpm.service" ${service_path}
+    if [[ ! -f ${shell_script_path}/systemd/php-fpm.service ]]; then
+        printf "%s/systemd/php-fpm.service doesn't exist.\n We can not start php-fpm service!\n" "${shell_script_path}"
+    else
+        systemctl enable php-fpm
+        systemctl start php-fpm
+    fi
 fi
 
 printf "Exit the script if %s doesn't exist.\n" "${shell_script_path}"
@@ -388,49 +400,57 @@ cd "${shell_script_path}" || exit 1
 ########################################################################################################################
 # install redis
 # cd ${save_path}
-tar -xvf ${redis_path} -C ${save_path}
-redis_work_directory=${save_path}/${redis_directory}
+if [[ ! -d ${redis_install_dir} ]]
+then
+    tar -xvf ${redis_path} -C ${save_path}
+    redis_work_directory=${save_path}/${redis_directory}
 
-printf "Exit the script if directory %s doesn't exist.\n" "${redis_work_directory}"
-cd "${redis_work_directory}" || exit 1
-make
-make install
+    printf "Exit the script if directory %s doesn't exist.\n" "${redis_work_directory}"
+    cd "${redis_work_directory}" || exit 1
+    make
+    make PREFIX=${redis_install_dir} install
 
-if [[ -f ${redis_work_directory}/redis.conf ]]; then
-    cp "${redis_work_directory}/redis.conf" /etc
-else
-    printf "Redis configuration file doesn't exist. please add it manually!\n"
-fi
-if [[ -f /etc/redis.conf ]]; then
-    sed -i "s/daemonize no/daemonize yes/g" /etc/redis.conf
-else
-    printf "/etc/redis.conf doesn't exist! Redis installation may be failed. \n"
-    exit 1
-fi
+    if [[ -f ${redis_work_directory}/redis.conf ]]; then
+        cp "${redis_work_directory}/redis.conf" /etc
+    else
+        printf "Redis configuration file doesn't exist. please add it manually!\n"
+    fi
+    if [[ -f /etc/redis.conf ]]; then
+        sed -i "s/daemonize no/daemonize yes/g" /etc/redis.conf
+    else
+        printf "/etc/redis.conf doesn't exist! Redis installation may be failed. \n"
+        exit 1
+    fi
 
-# add redis service
-cp "${shell_script_path}/systemd/redis.service" ${service_path}
-if [[ -f ${service_path}/redis.service ]]; then
-    systemctl enable redis
-    systemctl start redis
-fi
-
-# install php redis extension
-printf "Exit the script if phpredis can not downloaded succeefully.\n"
-cd "${phpredis_directory}" || exit 1
-git checkout -b php7 origin/php7
-phpize
-./configure --with-php-config=php-config
-make && make install
-
-# modify php.ini add redis.so
-if [[ -f /usr/local/php/etc/php.ini ]]; then
-    printf "Finishes install redis extension, now modify php.ini to add redis.so to extension. \n"
-    sed -i "s/;extension=php_shmop.dll/;extension=php_shmop.dll\nextension=redis.so/g" /usr/local/php/etc/php.ini
+    # add redis service
+    cp "${shell_script_path}/systemd/redis.service" ${service_path}
+    if [[ -f ${service_path}/redis.service ]]; then
+        systemctl enable redis
+        systemctl start redis
+    fi
 fi
 
-systemctl restart php-fpm
+# install php redis extension if needed
+php_extension_dir=$(${php_install_dir}/bin/php-config | grep extension-dir | awk '{print $NF}' | sed -e 's/\[//' | sed -e 's/\]//')
+redis_wc=$(ls "${php_extension_dir}" | grep -c redis.so)
+if [[ ! ${redis_wc} -gt 0 ]]
+then
+    printf "Exit the script if phpredis can not downloaded succeefully.\n"
+    cd "${phpredis_directory}" || exit 1
+    git checkout -b php7 origin/php7
+    phpize
+    ./configure --with-php-config=php-config
+    make && make install
+
+    # modify php.ini add redis.so
+    if [[ -f /usr/local/php/etc/php.ini ]]; then
+        printf "Finishes install redis extension, now modify php.ini to add redis.so to extension. \n"
+        sed -i "s/;extension=php_shmop.dll/;extension=php_shmop.dll\nextension=redis.so/g" /usr/local/php/etc/php.ini
+    fi
+    systemctl restart php-fpm
+fi
 # shellcheck source=/dev/null
 source ${profile_file}
 cd "${shell_script_path}" || exit 1
+
 ########################################################################################################################

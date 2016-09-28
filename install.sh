@@ -328,7 +328,7 @@ cd "${shell_script_path}" || exit 1
 if [[ ! -d ${php_install_dir} ]]
 then
     tar -xvf ${php_path} -C ${save_path}
-    libxml2_lib=/usr/include/libxml2/libxml
+    libxml2_lib=/usr/include/libxml2/libxml # fix off_t type error
     if [[ -d ${libxml2_lib} ]]
     then
         grep "${libxml2_lib}" /etc/ld.so.conf || printf "\n%s\n" "${libxml2_lib}" >> /etc/ld.so.conf

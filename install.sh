@@ -4,17 +4,18 @@ set -x
 
 ########################################################################################################################
 # base dependency package
-yum -y install net-tools wget vim gcc git autoconf bzip2
+# yum -y install net-tools wget vim gcc git autoconf bzip2
 
 # mysql dependency package
-yum -y install libaio
+# yum -y install libaio
 
 # nginx dependency package
-yum -y install pcre-devel zlib-devel
+# yum -y install pcre-devel zlib-devel
 
 # php dependency package
-yum -y install libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel
+#yum -y install libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel
 
+yum -y install net-tools wget vim gcc git autoconf bzip2 libaio pcre-devel zlib-devel libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel
 
 centos_version=$(hostnamectl | grep "Operating System" | awk '{print $5}')
 if [[ ${centos_version} -ne 7 ]]

@@ -64,4 +64,4 @@ Feedback
 CentOS 7-lnmp work fine in my machine. It may be some problem when use it in different machine or try to use it in different linux distributions. If you have any problem using this script, you can 
 
 * [Add an issue](https://github.com/eleven26/centos7-lnmp/issues) at github.
-* Contact me by my personal email: 916809498@qq.com
+* Contact me via my personal email: 916809498@qq.com

@@ -184,13 +184,17 @@ fi
 if [[ ! -d ${mysql_install_dir} ]]
 then
     printf "Decompressing %s to %s....\n" "${mysql_path}" "${save_path}"
-    tar -xvf ${mysql_path} -C ${save_path}
+    if [[ ! -f "${save_path}/${mysql_pkg_name}.gz" ]]; then
+        tar -xvf ${mysql_path} -C ${save_path}
+    fi
 
     printf "Decompressing %s/%s.gz to /usr/local\n" "${save_path}" "${mysql_pkg_name}"
     tar -xvf "${save_path}/${mysql_pkg_name}.gz" -C /usr/local
 
     printf "Creating mysql soft link.\n"
-    ln -s "/usr/local/${mysql_directory}" /usr/local/mysql
+    if [[ -d "/usr/local/${mysql_directory}" ]]; then
+        ln -s "/usr/local/${mysql_directory}" /usr/local/mysql
+    fi
 
     printf "Adding mysql lib to /etc/ld.so.conf.\n"
     grep "/usr/local/mysql/lib" /etc/ld.so.conf || printf "\n/usr/local/mysql/lib\n" >> /etc/ld.so.conf

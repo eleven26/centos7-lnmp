@@ -196,6 +196,9 @@ then
         ln -s "/usr/local/${mysql_directory}" /usr/local/mysql
     fi
 
+    soft_link_dir=$(readlink -f /usr/local/mysql)
+    #todo readlink -f /usr/local/mysql == /usr/local/mysql_directory}
+
     printf "Adding mysql lib to /etc/ld.so.conf.\n"
     grep "/usr/local/mysql/lib" /etc/ld.so.conf || printf "\n/usr/local/mysql/lib\n" >> /etc/ld.so.conf
     ldconfig -v

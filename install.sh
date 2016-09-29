@@ -66,6 +66,50 @@ php_pkg_name=$(echo ${php_pkg_url} | awk -F '/' '{print $5}')
 redis_pkg_name=$(echo ${redis_pkg_url} | awk -F '/' '{print $NF}')
 nginx_pkg_name=$(echo ${nginx_pkg_url} | awk -F '/' '{print $NF}')
 
+php_configure_option=$(cat << EOF
+--prefix=/usr/local/php\
+--with-config-file-path=/usr/local/php/etc\
+--with-mysql=/usr/local/mysql\
+--with-mysqli=/usr/local/mysql/bin/mysql_config\
+--with-iconv\
+--with-freetype-dir\
+--with-jpeg-dir\
+--with-png-dir\
+--with-zlib\
+--with-libxml-dir\
+--enable-xml\
+--disable-rpath\
+--enable-discard-path\
+--enable-safe-mode\
+--enable-bcmath \
+--enable-shmop \
+--enable-sysvsem \
+--enable-inline-optimization \
+--with-curl \
+--with-curlwrappers \
+--enable-mbregex \
+--enable-fastcgi \
+--enable-fpm \
+--enable-force-cgi-redirect \
+--enable-mbstring \
+--with-mcrypt \
+--with-gd \
+--enable-gd-native-ttf \
+--with-openssl \
+--with-mhash \
+--enable-pcntl \
+--enable-sockets \
+--with-xmlrpc \
+--enable-zip \
+--enable-soap \
+--without-pear \
+--with-zlib \
+--enable-pdo \
+--with-pdo-mysql \
+--enable-opcache)
+EOF
+)
+
 # add some environment variable
 function add_env() {
     printf "\nexport PATH=%s:\$PATH\n" "$1" >> ${profile_file}
@@ -202,6 +246,9 @@ then
 
     soft_link_dir=$(readlink -f /usr/local/mysql)
     #todo readlink -f /usr/local/mysql == /usr/local/mysql_directory}
+    if [[ ! ${soft_link_dir} == "/usr/local/mysql/{$mysql_directory}" ]]; then
+        printf "Create mysql soft link failed!\n"
+    fi
 
     printf "Adding mysql lib to /etc/ld.so.conf.\n"
     grep "/usr/local/mysql/lib" /etc/ld.so.conf || printf "\n/usr/local/mysql/lib\n" >> /etc/ld.so.conf
@@ -350,7 +397,7 @@ then
     # configure
     printf "Exit the script if directory %s doesn't exist.\n" "${php_work_directory}"
     cd "${php_work_directory}" || exit 4
-    ./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --with-mysql=/usr/local/mysql --with-mysqli=/usr/local/mysql/bin/mysql_config --with-iconv --with-freetype-dir --with-jpeg-dir --with-png-dir --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-discard-path --enable-safe-mode --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --with-curlwrappers --enable-mbregex --enable-fastcgi --enable-fpm --enable-force-cgi-redirect --enable-mbstring --with-mcrypt --with-gd --enable-gd-native-ttf --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-zip --enable-soap --without-pear --with-zlib --enable-pdo --with-pdo-mysql --enable-opcache
+    ./configure "${php_configure_option}"
     make
     make install
 

@@ -34,7 +34,7 @@ my $save_path = $current_path.'/download/'; # downloaded file will be save in do
 my %download_url = (
     mysql    => 'http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.15-linux-glibc2.5-x86_64.tar',
     php      => 'http://cn2.php.net/get/php-7.0.11.tar.bz2/from/this/mirror',
-    redis    => 'http://download.redis.io/redis-stable.tar.gz',
+    redis    => 'http://download.redis.io/redis-stable.tar.gz', # todo .tar not .tar.gz
     nginx    => 'http://nginx.org/download/nginx-1.11.4.tar.gz',
     phpredis => 'https://github.com/phpredis/phpredis.git',
 );

@@ -164,7 +164,7 @@ unless (-d $install_dir.'/mysql')
     system "tar -xvf $package_path{'mysql'}.gz -C $install_dir";
 
     say "Create mysql soft link.";
-    symlink "$install_dir/$package_dir{'mysql'} $install_dir/mysql"
+    symlink("$install_dir/$package_dir{'mysql'}", "$install_dir/mysql")
         unless (-l "$install_dir/mysql" && ("$install_dir/$package_dir{'mysql'}" eq (readlink "$install_dir/mysql")));
 
     say "Adding mysql lib to /etc/ld.so.conf.";

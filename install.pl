@@ -29,7 +29,7 @@ my $profile_file='/etc/profile';         # bin path will be added to this file
 my $service_path='/lib/systemd/system';  # system service configuration file save path
 my $install_dir = '/usr/local';          # install directory
 
-my $save_path = $current_path.'/download'; # downloaded file will be save in download in current directory instead at /root/download
+my $save_path = $current_path.'/download/'; # downloaded file will be save in download in current directory instead at /root/download
 
 my %download_url = (
     mysql    => 'http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.15-linux-glibc2.5-x86_64.tar',

@@ -9,17 +9,17 @@ use File::Basename;
 system 'export LC_ALL=C && export LANGUAGE=C';
 
 # install basic dependency
-system 'yum -y install net-tools wget vim gcc git autoconf bzip2 libaio pcre-devel zlib-devel libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel' or die 'can not install basic dependency';
+system 'yum -y install net-tools wget vim gcc git autoconf bzip2 libaio pcre-devel zlib-devel libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel';
 
 my $centos_version = system "hostnamectl | grep 'Operating System' | awk '{print \$5}'";
 if ($centos_version != 7)
 {
-    system 'yum -y install libmcrypt-devel' or die 'can not install libmcrypt-devel';
+    system 'yum -y install libmcrypt-devel';
 } else
 {
     # yum -y install libmcrypt-devel # doesn't work in centos7
     # centos7 php openssl dependency package
-    system 'yum -y install epel-release libmcrypt-devel.x86_64' or die 'can not install libmcrypt-devel';
+    system 'yum -y install epel-release libmcrypt-devel.x86_64';
 }
 
 

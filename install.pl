@@ -54,7 +54,7 @@ my %package_path = (
 );
 my %package_name = (
     mysql    => basename($download_url{'mysql'}),
-    php      => `echo $download_url{''} | awk -F '/' '{print \$(NF -3)}'`,
+    php      => `echo $download_url{'php'} | awk -F '/' '{print \$(NF -3)}'`,
     redis    => basename($download_url{'redis'}),
     nginx    => basename($download_url{'nginx'}),
 );

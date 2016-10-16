@@ -23,7 +23,8 @@ if ($centos_version eq 7)
 }
 
 
-my $current_path = chomp `pwd`;          # get current path
+my $current_path = `pwd`;                # get current path
+$current_path =~ s/\s+$//;               # remove "\n"
 my $profile_file='/etc/profile';         # bin path will be added to this file
 my $service_path='/lib/systemd/system';  # system service configuration file save path
 my $install_dir = '/usr/local';          # install directory

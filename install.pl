@@ -12,7 +12,7 @@ system 'export LC_ALL=C && export LANGUAGE=C';
 system 'yum -y install net-tools wget vim gcc git autoconf bzip2 libaio pcre-devel zlib-devel libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel';
 
 my $centos_version = system "hostnamectl | grep 'Operating System' | awk '{print \$5}'";
-if ($centos_version != 7)
+if ($centos_version eq 7)
 {
     system 'yum -y install libmcrypt-devel';
 } else
@@ -23,7 +23,7 @@ if ($centos_version != 7)
 }
 
 
-my $current_path = `pwd`;                # get current path
+my $current_path = chomp `pwd`;          # get current path
 my $profile_file='/etc/profile';         # bin path will be added to this file
 my $service_path='/lib/systemd/system';  # system service configuration file save path
 my $install_dir = '/usr/local';          # install directory

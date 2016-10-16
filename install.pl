@@ -130,13 +130,11 @@ sub get_unpacked_name {
 
 sub get_package_name {
     my $url = $_[0];
-    my $match_name;
     while ($url =~ /\/(.*?\.(tar|gz|bz2|xz))/)
     {
-        $match_name = $1;
-        $url = &get_package_name($match_name);
+        $url = &get_package_name($1);
     }
-    $match_name;
+    $url;
 }
 
 say "check $save_path if exists.";

@@ -119,9 +119,9 @@ sub add_env {
 # get folder name after uncompress package, remove extension like bz2, tar...
 sub get_unpacked_name {
     my $package_name = $_[0];
-    if ($package_name =~ /\/((.*?)\.(tar|gz|bz2|xz))/)
+    if ($package_name =~ /\/((.*?)\.(gz|bz2|xz|tar))/)
     {
-        if ($2 =~ /((.*?)\.(tar|gz|bz2|xz))/) {
+        if ($2 =~ /((.*?)\.(gz|bz2|xz|tar))/) {
             $2;
         }
         $2;
@@ -130,7 +130,7 @@ sub get_unpacked_name {
 
 sub get_package_name {
     my $url = $_[0];
-    while ($url =~ /\/(.*?\.(tar|gz|bz2|xz))/)
+    while ($url =~ /\/(.*?\.(gz|bz2|xz|tar))/)
     {
         $url = &get_package_name($1);
     }

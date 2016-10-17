@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 use 5.010;
 use strict;
 use warnings;
@@ -6,7 +6,8 @@ use warnings;
 use File::Spec;
 use File::Basename;
 
-system 'export LC_ALL=C && export LANGUAGE=C';
+$ENV{'LC_ALL'} = 'C';
+$ENV{'LANGUAGE'} = 'C';
 
 # install basic dependency
 system 'yum -y install net-tools wget vim gcc git autoconf bzip2 libaio pcre-devel zlib-devel libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel';

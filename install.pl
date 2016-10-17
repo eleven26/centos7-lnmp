@@ -35,7 +35,7 @@ my $save_path = $current_path.'/download/'; # downloaded file will be save in do
 my %download_url = (
     mysql    => 'http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.15-linux-glibc2.5-x86_64.tar',
     php      => 'http://cn2.php.net/get/php-7.0.11.tar.bz2/from/this/mirror',
-    redis    => 'http://download.redis.io/redis-stable.tar.gz', # todo .tar not .tar.gz
+    redis    => 'http://download.redis.io/redis-stable.tar.gz',
     nginx    => 'http://nginx.org/download/nginx-1.11.4.tar.gz',
     phpredis => 'https://github.com/phpredis/phpredis.git',
 );
@@ -176,7 +176,7 @@ unless (-d $install_dir.'/mysql')
     system "mkdir $install_dir/mysql/data" unless -d $install_dir.'/mysql/data';
 
     say "Copy mysql configuration file ${current_path}/mysql/my.cnf to /etc.";
-    system "cp ${current_path}/mysql/my.cnf /etc" && warn "can not copy mysql configuration file: $!.";
+    system "cp ${current_path}/mysql/my.cnf /etc" == 0 or warn "can not copy mysql configuration file: $!.";
 
     say "Copy mysql service file ${current_path}/systemd/mysql.service to $service_path, so that mysql can run as a system's service.";
     system "cp ${current_path}/systemd/mysql.service ${service_path}";
@@ -185,10 +185,10 @@ unless (-d $install_dir.'/mysql')
     say "Now initializing mysql, after this finishes, it will generate the initializing password for root";
     # add user and group
     say "Adding user mysql and group mysql.";
-    system "groupadd mysql" && warn "can not add mysql group: $!";
-    system "useradd -r -g mysql -s /bin/false mysql" && warn "can not add use mysql: $!";
+    system "groupadd mysql" == 0 or warn "can not add mysql group: $!";
+    system "useradd -r -g mysql -s /bin/false mysql" == 0 or warn "can not add use mysql: $!";
     say "Changing mysql directory owned by mysql.";
-    system "chown -R mysql:mysql $install_dir/mysql" && warn "$install_dir/mysql can not be chown: $!";
+    system "chown -R mysql:mysql $install_dir/mysql" == 0 or warn "$install_dir/mysql can not be chown: $!";
 
     # attention: the next line will generate output in ~/mysql_initialize, the root's password will be appeared in that file
     say "Begin to initializing mysql.";

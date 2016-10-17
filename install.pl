@@ -176,11 +176,11 @@ unless (-d $install_dir.'/mysql')
 
     system "mkdir $install_dir/mysql/data" unless -d $install_dir.'/mysql/data';
 
-    say "Copy mysql configuration file to /etc.";
-    system "cp '${current_path}/mysql/my.cnf' /etc" or warn "can not copy mysql configuration file: $!.";
+    say "Copy mysql configuration file ${current_path}/mysql/my.cnf to /etc.";
+    system "cp ${current_path}/mysql/my.cnf /etc" or warn "can not copy mysql configuration file: $!.";
 
-    say "Copy mysql service file to $service_path, so that mysql can run as a system's service.";
-    system "cp '${current_path}/systemd/mysql.service' ${service_path}";
+    say "Copy mysql service file ${current_path}/systemd/mysql.service to $service_path, so that mysql can run as a system's service.";
+    system "cp ${current_path}/systemd/mysql.service ${service_path}";
 
     # initialize mysql
     say "Now initializing mysql, after this finishes, it will generate the initializing password for root";

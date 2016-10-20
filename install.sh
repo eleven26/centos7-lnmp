@@ -33,19 +33,18 @@ fi
 ########################################################################################################################
 
 # NLS nuisances.
-LC_ALL=C
-export LC_ALL
-LANGUAGE=C
-export LANGUAGE
+export LC_ALL=C
+export LANGUAGE=C
 
 shell_script_path=$(pwd)
 profile_file=/etc/profile
 service_path=/lib/systemd/system
 
-save_path=/root/downloads
-package_prefix=/root/downloads
+save_path=${shell_script_path}/downloads
+package_prefix=${shell_script_path}/downloads
 
 install_log=install.log
+touch install.log
 
 # if you have needed packages, type the path behind
 mysql_path=${package_prefix}/mysql-5.7.15-linux-glibc2.5-x86_64.tar

@@ -18,7 +18,8 @@ set -x
 # php dependency package
 #yum -y install libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel
 
-yum -y install net-tools wget vim gcc git autoconf bzip2 libaio pcre-devel zlib-devel libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel
+yum -y install net-tools wget vim gcc git autoconf bzip2 libaio pcre-devel \
+    zlib-devel libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel
 
 centos_version=$(hostnamectl | grep "Operating System" | awk '{print $5}')
 if [[ ${centos_version} -ne 7 ]]
@@ -36,21 +37,14 @@ fi
 export LC_ALL=C
 export LANGUAGE=C
 
-shell_script_path=$(pwd)
+current_path=$(pwd)
 profile_file=/etc/profile
 service_path=/lib/systemd/system
 
-save_path=${shell_script_path}/downloads
-package_prefix=${shell_script_path}/downloads
+save_path=${current_path}/downloads
 
 install_log=install.log
-touch install.log
-
-# if you have needed packages, type the path behind
-mysql_path=${package_prefix}/mysql-5.7.15-linux-glibc2.5-x86_64.tar
-php_path=${package_prefix}/php-7.0.11.tar.bz2
-redis_path=${package_prefix}/redis-stable.tar.gz
-nginx_path=${package_prefix}/nginx-1.11.4.tar.gz
+touch ${install_log}
 
 # packages download's url
 mysql_pkg_url=http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.15-linux-glibc2.5-x86_64.tar
@@ -105,7 +99,7 @@ php_configure_option=$(cat << EOF
 --with-zlib \
 --enable-pdo \
 --with-pdo-mysql \
---enable-opcache)
+--enable-opcache
 EOF
 )
 
@@ -155,31 +149,31 @@ else
 fi
 
 # mysql
-if [[ ! -f ${mysql_path} ]]
+if [[ ! -f ${save_path}/${mysql_pkg_name} ]]
 then
-    printf "%s doesn't exist, begin to download....\n" "${mysql_path}"
-    wget -O ${mysql_path} ${mysql_pkg_url}
+    printf "%s doesn't exist, begin to download....\n" "${save_path}/${mysql_pkg_name}"
+    wget -O ${save_path}/${mysql_pkg_name} ${mysql_pkg_url}
 fi
 
 # php
-if [[ ! -f ${php_path} ]]
+if [[ ! -f ${save_path}/${php_pkg_name} ]]
 then
-    printf "%s doesn't exist, begin to download...\n" "${php_path}"
-    wget -O ${php_path} ${php_pkg_url}
+    printf "%s doesn't exist, begin to download...\n" "${save_path}/${php_pkg_name}"
+    wget -O ${save_path}/${php_pkg_name} ${php_pkg_url}
 fi
 
 # nginx
-if [[ ! -f ${nginx_path} ]]
+if [[ ! -f ${save_path}/${redis_pkg_name} ]]
 then
-    printf "%s doesn't exist, begin to download...\n" "${nginx_path}"
-    wget -O ${nginx_path} ${nginx_pkg_url}
+    printf "%s doesn't exist, begin to download...\n" "${save_path}/${redis_pkg_name}"
+    wget -O ${save_path}/${redis_pkg_name} ${nginx_pkg_url}
 fi
 
 # redis
-if [[ ! -f ${redis_path} ]]
+if [[ ! -f ${save_path}/${nginx_pkg_name} ]]
 then
-    printf "%s doesn't exist, begin to download...\n" "${redis_path}"
-    wget -O ${redis_path} ${redis_pkg_url}
+    printf "%s doesn't exist, begin to download...\n" "${save_path}/${nginx_pkg_name}"
+    wget -O ${save_path}/${nginx_pkg_name} ${redis_pkg_url}
 fi
 
 # phpredis
@@ -190,28 +184,28 @@ fi
 
 # judge whether all the files are downloaded succeed
 # mysql
-if [[ ! -f ${mysql_path} ]]
+if [[ ! -f ${save_path}/${mysql_pkg_name} ]]
 then
     printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${mysql_pkg_name}"
     exit 1
 fi
 
 # php
-if [[ ! -f ${php_path} ]]
+if [[ ! -f ${save_path}/${php_pkg_name} ]]
 then
     printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${php_pkg_name}"
     exit 1
 fi
 
 # nginx
-if [[ ! -f ${nginx_path} ]]
+if [[ ! -f ${save_path}/${redis_pkg_name} ]]
 then
     printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${nginx_pkg_name}"
     exit 1
 fi
 
 # redis
-if [[ ! -f ${redis_path} ]]
+if [[ ! -f ${save_path}/${nginx_pkg_name} ]]
 then
     printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${redis_pkg_name}"
     exit 1
@@ -230,9 +224,9 @@ fi
 # use the absolute path instead of enter the save path
 if [[ ! -d ${mysql_install_dir} ]]
 then
-    printf "Decompressing %s to %s....\n" "${mysql_path}" "${save_path}"
+    printf "Decompressing %s to %s....\n" "${save_path}/${mysql_pkg_name}" "${save_path}"
     if [[ ! -f "${save_path}/${mysql_pkg_name}.gz" ]]; then
-        tar -xvf ${mysql_path} -C ${save_path}
+        tar -xvf ${save_path}/${mysql_pkg_name} -C ${save_path}
     fi
 
     printf "Decompressing %s/%s.gz to /usr/local\n" "${save_path}" "${mysql_pkg_name}"
@@ -272,20 +266,20 @@ then
         mkdir /usr/local/mysql/data
     fi
 
-    if [[ -f ${shell_script_path}/mysql/my.cnf ]]; then
+    if [[ -f ${current_path}/mysql/my.cnf ]]; then
         printf "Copy mysql configuration file to /etc...\n"
-        cp "${shell_script_path}/mysql/my.cnf" /etc
+        cp "${current_path}/mysql/my.cnf" /etc
     else
-        message="${shell_script_path}/mysql/mysql.cnf doesn't exist!\n"
+        message="${current_path}/mysql/mysql.cnf doesn't exist!\n"
         printf message
         printf message >> ${install_log}
     fi
 
-    if [[ -f ${shell_script_path}/systemd/mysql.service ]]; then
+    if [[ -f ${current_path}/systemd/mysql.service ]]; then
         printf "Copy mysql service file to %s, so that mysql can run as a system's service...\n" "${service_path}"
-        cp "${shell_script_path}/systemd/mysql.service" ${service_path}
+        cp "${current_path}/systemd/mysql.service" ${service_path}
     else
-        message="${shell_script_path}/systemd/mysql.service doesn't exist!\n"
+        message="${current_path}/systemd/mysql.service doesn't exist!\n"
         printf message
         printf message >> ${install_log}
     fi
@@ -310,17 +304,17 @@ then
     # shellcheck source=/dev/null
     source ${profile_file}
 
-    if [[ -f ${shell_script_path}/systemd/mysql.service ]]; then
+    if [[ -f ${current_path}/systemd/mysql.service ]]; then
         systemctl enable mysql
         systemctl start mysql
     else
-        message="File ${shell_script_path}/systemd/mysql.service doesn't exist! We can not start the mysql service, you can add it manually."
+        message="File ${current_path}/systemd/mysql.service doesn't exist! We can not start the mysql service, you can add it manually."
         printf message
     fi
 fi
 #todo modify mysql root password using mysql script, before do that ensure mysqld service is started.
 
-# cd ${shell_script_path}
+# cd ${current_path}
 ########################################################################################################################
 
 
@@ -329,7 +323,7 @@ fi
 # cd ${save_path}
 if [[ ! -d ${nginx_install_dir} ]]
 then
-    tar -xvf ${nginx_path} -C ${save_path}
+    tar -xvf ${save_path}/${redis_pkg_name} -C ${save_path}
     # using absolute path instead enter the corresponding directory
     # we cannot use absolute path because nginx's configure file contains relative path
     nginx_work_directory=${save_path}/${nginx_directory}
@@ -355,28 +349,28 @@ then
         mkdir ${vhost_dir}
     fi
     # add vhost example
-    cp "${shell_script_path}/nginx/vhost/vhost-default.conf.example" /usr/local/nginx/vhost
+    cp "${current_path}/nginx/vhost/vhost-default.conf.example" /usr/local/nginx/vhost
     rewrite_dir=/usr/local/nginx/conf/rewrite
     if [[ ! -d ${rewrite_dir} ]]
     then
         mkdir ${rewrite_dir}
     fi
-    cp "${shell_script_path}/nginx/rewrite/laravel.conf" /usr/local/nginx/rewrite
+    cp "${current_path}/nginx/rewrite/laravel.conf" /usr/local/nginx/rewrite
 
     # add nginx service
-    cp "${shell_script_path}/systemd/nginx.service" ${service_path}
-    if [[ -f ${shell_script_path}/systemd/nginx.service ]]; then
+    cp "${current_path}/systemd/nginx.service" ${service_path}
+    if [[ -f ${current_path}/systemd/nginx.service ]]; then
         systemctl enable nginx
         systemctl start nginx
     else
-        message="${shell_script_path}/systemd/nginx.service doesn't exist! We can not start the nginx's system service.\n"
+        message="${current_path}/systemd/nginx.service doesn't exist! We can not start the nginx's system service.\n"
         printf message
         printf message >> ${install_log}
     fi
 fi
 
-printf "Exit the script if %s doesn't exist.\n" "${shell_script_path}"
-cd "${shell_script_path}" || exit 1
+printf "Exit the script if %s doesn't exist.\n" "${current_path}"
+cd "${current_path}" || exit 1
 ########################################################################################################################
 
 
@@ -384,7 +378,7 @@ cd "${shell_script_path}" || exit 1
 # install php, it will take a long time
 if [[ ! -d ${php_install_dir} ]]
 then
-    tar -xvf ${php_path} -C ${save_path}
+    tar -xvf ${save_path}/${php_pkg_name} -C ${save_path}
     libxml2_lib=/usr/include/libxml2/libxml # fix off_t type error
     if [[ -d ${libxml2_lib} ]]
     then
@@ -440,17 +434,17 @@ then
     fi
 
     # add php-fpm service
-    cp "${shell_script_path}/systemd/php-fpm.service" ${service_path}
-    if [[ ! -f ${shell_script_path}/systemd/php-fpm.service ]]; then
-        printf "%s/systemd/php-fpm.service doesn't exist.\n We can not start php-fpm service!\n" "${shell_script_path}"
+    cp "${current_path}/systemd/php-fpm.service" ${service_path}
+    if [[ ! -f ${current_path}/systemd/php-fpm.service ]]; then
+        printf "%s/systemd/php-fpm.service doesn't exist.\n We can not start php-fpm service!\n" "${current_path}"
     else
         systemctl enable php-fpm
         systemctl start php-fpm
     fi
 fi
 
-printf "Exit the script if %s doesn't exist.\n" "${shell_script_path}"
-cd "${shell_script_path}" || exit 1
+printf "Exit the script if %s doesn't exist.\n" "${current_path}"
+cd "${current_path}" || exit 1
 ########################################################################################################################
 
 
@@ -459,7 +453,7 @@ cd "${shell_script_path}" || exit 1
 # cd ${save_path}
 if [[ ! -d ${redis_install_dir} ]]
 then
-    tar -xvf ${redis_path} -C ${save_path}
+    tar -xvf ${save_path}/${nginx_pkg_name} -C ${save_path}
     redis_work_directory=${save_path}/${redis_directory}
 
     printf "Exit the script if directory %s doesn't exist.\n" "${redis_work_directory}"
@@ -480,7 +474,7 @@ then
     fi
 
     # add redis service
-    cp "${shell_script_path}/systemd/redis.service" ${service_path}
+    cp "${current_path}/systemd/redis.service" ${service_path}
     if [[ -f ${service_path}/redis.service ]]; then
         systemctl enable redis
         systemctl start redis
@@ -508,6 +502,6 @@ then
 fi
 # shellcheck source=/dev/null
 source ${profile_file}
-cd "${shell_script_path}" || exit 1
+cd "${current_path}" || exit 1
 
 ########################################################################################################################

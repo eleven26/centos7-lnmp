@@ -24,16 +24,11 @@ Install the base dependency.
 yum -y install net-tools git
 ```
 
-Make default directory to do the installation job and enter this directory.
-```
-mkdir /root/downloads
-cd /root/downloads
-```
 Clone this repository to /root/downloads.
 ```
 git clone https://github.com/eleven26/centos7-lnmp.git
 ```
-Enter the repository directory.
+Enter the repository directory. The packages will be save at  /path/to/centos7-lnmp/downloads.
 ```
 cd centos7-lnmp
 ```

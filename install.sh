@@ -22,15 +22,15 @@ yum -y install net-tools wget vim gcc git autoconf bzip2 libaio pcre-devel make 
     zlib-devel libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel
 
 centos_version=$(hostnamectl | grep "Operating System" | awk '{print $5}')
-if [[ ${centos_version} -ne 7 ]]
-then
-    yum -y install libmcrypt-devel
-else
+#if [[ ${centos_version} -ne 7 ]]
+#then
+#    yum -y install libmcrypt-devel
+#else
     # yum -y install libmcrypt-devel # doesn't work in centos7
     # centos7 php openssl dependency package
-    yum -y install epel-release
-    yum -y install libmcrypt-devel.x86_64
-fi
+#    yum -y install epel-release
+#    yum -y install libmcrypt-devel.x86_64
+#fi
 ########################################################################################################################
 
 # NLS nuisances.
@@ -60,19 +60,19 @@ redis_pkg_name=$(echo ${redis_pkg_url} | awk -F '/' '{print $NF}')
 nginx_pkg_name=$(echo ${nginx_pkg_url} | awk -F '/' '{print $NF}')
 
 php_configure_option=$(cat << EOF
---prefix=/usr/local/php\
---with-config-file-path=/usr/local/php/etc\
---with-mysql=/usr/local/mysql\
---with-mysqli=/usr/local/mysql/bin/mysql_config\
---with-iconv\
---with-freetype-dir\
---with-jpeg-dir\
---with-png-dir\
---with-zlib\
---with-libxml-dir\
---enable-xml\
---disable-rpath\
---enable-discard-path\
+--prefix=/usr/local/php \
+--with-config-file-path=/usr/local/php/etc \
+--with-mysql=/usr/local/mysql \
+--with-mysqli=/usr/local/mysql/bin/mysql_config \
+--with-iconv \
+--with-freetype-dir \
+--with-jpeg-dir \
+--with-png-dir \
+--with-zlib \
+--with-libxml-dir \
+--enable-xml \
+--disable-rpath \
+--enable-discard-path \
 --enable-safe-mode\
 --enable-bcmath \
 --enable-shmop \

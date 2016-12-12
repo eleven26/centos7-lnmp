@@ -85,7 +85,7 @@ php_configure_option=$(cat << EOF
 --enable-fpm \
 --enable-force-cgi-redirect \
 --enable-mbstring \
---with-mcrypt \
+--enable-mcrypt \
 --with-gd \
 --enable-gd-native-ttf \
 --with-openssl \

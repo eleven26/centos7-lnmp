@@ -71,7 +71,7 @@ php_configure_option=$(cat << EOF
 --with-libxml-dir \
 --enable-xml \
 --disable-rpath \
---enable-safe-mode\
+--enable-safe-mode \
 --enable-shmop \
 --enable-sysvsem \
 --enable-inline-optimization \

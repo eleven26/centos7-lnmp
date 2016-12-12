@@ -390,7 +390,7 @@ then
     # configure
     printf "Exit the script if directory %s doesn't exist.\n" "${php_work_directory}"
     cd "${php_work_directory}" || exit 4
-    ./configure "${php_configure_option}"
+    ./configure ${php_configure_option}
     make
     make install
 

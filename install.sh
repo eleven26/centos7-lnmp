@@ -18,7 +18,7 @@ set -x
 # php dependency package
 #yum -y install libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel
 
-yum -y install net-tools wget vim gcc git autoconf bzip2 libaio pcre-devel \
+yum -y install net-tools wget vim gcc git autoconf bzip2 libaio pcre-devel make \
     zlib-devel libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel
 
 centos_version=$(hostnamectl | grep "Operating System" | awk '{print $5}')

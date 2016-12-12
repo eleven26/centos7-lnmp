@@ -12,7 +12,7 @@ The default version of each software are listed below:
   - php 7.0.11
   - MySQL 5.7.15
   - nginx 1.11.4
-  - Redis current stable version
+  - Redis 3.2.3
 
 All these software will be install in /usr/local directory by default.
 
@@ -41,6 +41,21 @@ Run this script to begin installation.
 ```
 ./install.sh
 ```
+
+Clean installation after failing to install some packages
+--
+```
+chmod +x clean.sh
+```
+And then run
+```
+./clean.sh --help
+```
+to see what can you do.
+For example, you can remove php use 
+```
+./clean.sh --php
+``` 
 
 Check if installation is succeed
 --

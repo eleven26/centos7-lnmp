@@ -55,6 +55,9 @@ while [ "$1" != "" ]; do
             # remove everything
             set -- "--all" "--deps" "--redis" "--mysqsl" "--php" "--nginx"
             ;;
+        --help )
+            usage
+            exit
             * )
                 usage
                 exit

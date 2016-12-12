@@ -62,7 +62,6 @@ nginx_pkg_name=$(echo ${nginx_pkg_url} | awk -F '/' '{print $NF}')
 php_configure_option=$(cat << EOF
 --prefix=/usr/local/php \
 --with-config-file-path=/usr/local/php/etc \
---with-mysql=/usr/local/mysql \
 --with-mysqli=/usr/local/mysql/bin/mysql_config \
 --with-iconv \
 --with-freetype-dir \
@@ -72,20 +71,15 @@ php_configure_option=$(cat << EOF
 --with-libxml-dir \
 --enable-xml \
 --disable-rpath \
---enable-discard-path \
 --enable-safe-mode\
---enable-bcmath \
 --enable-shmop \
 --enable-sysvsem \
 --enable-inline-optimization \
 --with-curl \
---with-curlwrappers \
 --enable-mbregex \
---enable-fastcgi \
 --enable-fpm \
---enable-force-cgi-redirect \
 --enable-mbstring \
---enable-mcrypt \
+--with-mcrypt \
 --with-gd \
 --enable-gd-native-ttf \
 --with-openssl \

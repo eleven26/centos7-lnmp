@@ -102,14 +102,14 @@ then
 fi
 
 # nginx
-if [[ ! -f ${save_path}/${redis_pkg_name} ]]
+if [[ ! -f ${save_path}/${nginx_pkg_name} ]]
 then
     printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${nginx_pkg_name}"
     exit 1
 fi
 
 # redis
-if [[ ! -f ${save_path}/${nginx_pkg_name} ]]
+if [[ ! -f ${save_path}/${redis_pkg_name} ]]
 then
     printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${redis_pkg_name}"
     exit 1

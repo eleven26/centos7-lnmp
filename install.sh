@@ -52,33 +52,30 @@ else
     printf "If packages doesn't exist, it will be download from the internet.\n"
 fi
 
-# mysql
-if [[ ! -f ${save_path}/${mysql_pkg_name} ]]
-then
-    printf "%s doesn't exist, begin to download....\n" "${save_path}/${mysql_pkg_name}"
-    wget -O ${save_path}/${mysql_pkg_name} ${mysql_pkg_url}
-fi
+# bash4 is not universal yet, so we can not use associative array
+pkg_array=(
+    "mysql:${mysql_pkg_name}:${mysql_pkg_url}"
+    "php:${php_pkg_name}:${php_pkg_url}"
+    "redis:${redis_pkg_name}:${redis_pkg_url}"
+    "nginx:${nginx_pkg_name}:${nginx_pkg_url}"
+    "phpredis:"
+)
 
-# php
-if [[ ! -f ${save_path}/${php_pkg_name} ]]
-then
-    printf "%s doesn't exist, begin to download...\n" "${save_path}/${php_pkg_name}"
-    wget -O ${save_path}/${php_pkg_name} ${php_pkg_url}
-fi
-
-# redis
-if [[ ! -f ${save_path}/${redis_pkg_name} ]]
-then
-    printf "%s doesn't exist, begin to download...\n" "${save_path}/${redis_pkg_name}"
-    wget -O ${save_path}/${redis_pkg_name} ${redis_pkg_url}
-fi
-
-# nginx
-if [[ ! -f ${save_path}/${nginx_pkg_name} ]]
-then
-    printf "%s doesn't exist, begin to download...\n" "${save_path}/${nginx_pkg_name}"
-    wget -O ${save_path}/${nginx_pkg_name} ${nginx_pkg_url}
-fi
+for item in "${pkg_array[@]}" ; do
+    key=${item%%:*}
+    if [[ ${key} == "phpredis" ]]
+    then
+        continue
+    fi
+    pkg_path=${item#*:}
+    path="${save_path}/${pkg_path%%:*}"
+    url=${item##*:}
+    if [[ ! -f ${path} ]]
+    then
+        printf "%s doesn't exist, begin to download....\n" "${path}"
+        wget -O ${path} ${url}
+    fi
+done
 
 # phpredis
 if [[ ! -d ${phpredis_directory} ]]
@@ -86,6 +83,10 @@ then
     git clone ${phpredis_pkg_url} ${phpredis_directory}
 fi
 
+
+pkg_file_array=(
+    "mysql:"
+)
 # judge whether all the files are downloaded succeed
 # mysql
 if [[ ! -f ${save_path}/${mysql_pkg_name} ]]

@@ -25,11 +25,12 @@ yum -y install net-tools wget vim gcc git autoconf bzip2 libaio pcre-devel make 
 centos_version=$(hostnamectl | grep "Operating System" | awk '{print $5}')
 if [[ ${centos_version} -ne 7 ]]
 then
-    libmcrypt-devel
+    yum -y install libmcrypt-devel
 else
     # yum -y install libmcrypt-devel # doesn't work in centos7
     # centos7 php openssl dependency package
-    yum -y install epel-release libmcrypt-devel.x86_64
+    yum -y install epel-release
+    yum -y install libmcrypt-devel.x86_64
 fi
 ########################################################################################################################
 

@@ -58,9 +58,11 @@ while [ "$1" != "" ]; do
         --help )
             usage
             exit
+            ;;
             * )
-                usage
-                exit
+            usage
+            exit
+            ;;
     esac
     shift
 done

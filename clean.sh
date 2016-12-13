@@ -27,7 +27,7 @@ while [ "$1" != "" ]; do
     case $1 in
         --deps | --depends | --dependency )
             # delete installed dependency
-            yum remove net-tools wget vim gcc git autoconf bzip2 libaio pcre-devel make \
+            yum remove net-tools wget gcc autoconf bzip2 libaio pcre-devel make \
                 zlib-devel libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel \
                 libmcrypt-devel epel-release libmcrypt-devel.x86_64
             ;;

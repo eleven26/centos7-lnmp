@@ -66,18 +66,18 @@ then
     wget -O ${save_path}/${php_pkg_name} ${php_pkg_url}
 fi
 
-# nginx
+# redis
 if [[ ! -f ${save_path}/${redis_pkg_name} ]]
 then
     printf "%s doesn't exist, begin to download...\n" "${save_path}/${redis_pkg_name}"
-    wget -O ${save_path}/${redis_pkg_name} ${nginx_pkg_url}
+    wget -O ${save_path}/${redis_pkg_name} ${redis_pkg_url}
 fi
 
-# redis
+# nginx
 if [[ ! -f ${save_path}/${nginx_pkg_name} ]]
 then
     printf "%s doesn't exist, begin to download...\n" "${save_path}/${nginx_pkg_name}"
-    wget -O ${save_path}/${nginx_pkg_name} ${redis_pkg_url}
+    wget -O ${save_path}/${nginx_pkg_name} ${nginx_pkg_url}
 fi
 
 # phpredis

@@ -19,19 +19,17 @@ set -x
 #yum -y install libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel
 #libmcrypt
 
+yum -y install net-tools wget vim gcc git autoconf bzip2 libaio pcre-devel make \
+    zlib-devel libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel
+
 centos_version=$(hostnamectl | grep "Operating System" | awk '{print $5}')
 if [[ ${centos_version} -ne 7 ]]
 then
-    yum -y install net-tools wget vim gcc git autoconf bzip2 libaio pcre-devel make \
-    zlib-devel libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel \
     libmcrypt-devel
 else
     # yum -y install libmcrypt-devel # doesn't work in centos7
     # centos7 php openssl dependency package
-    yum -y install net-tools wget vim gcc git autoconf bzip2 libaio pcre-devel make \
-    zlib-devel libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel \
-    epel-release \
-    yum -y install libmcrypt-devel.x86_64
+    yum -y install epel-release libmcrypt-devel.x86_64
 fi
 ########################################################################################################################
 

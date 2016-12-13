@@ -72,7 +72,9 @@ function get_unpacked_name(){
             echo "${filename}"
             return 0
         else
+            # Remove Smallest Suffix Pattern
             filename="${filename%.*}"
+            # Remove Largest Prefix Pattern (greedy match)
             extension="${filename##*.}"
         fi
     done

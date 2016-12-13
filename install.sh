@@ -30,7 +30,8 @@ else
     # centos7 php openssl dependency package
     yum -y install net-tools wget vim gcc git autoconf bzip2 libaio pcre-devel make \
     zlib-devel libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel \
-    epel-release libmcrypt-devel.x86_64
+    epel-release \
+    yum -y install libmcrypt-devel.x86_64
 fi
 ########################################################################################################################
 

@@ -227,7 +227,7 @@ fi
 # cd ${save_path}
 if [[ ! -d ${nginx_install_dir} ]]
 then
-    tar -xvf ${save_path}/${redis_pkg_name} -C ${save_path}
+    tar -xvf ${save_path}/${nginx_pkg_name} -C ${save_path}
     # using absolute path instead enter the corresponding directory
     # we cannot use absolute path because nginx's configure file contains relative path
     nginx_work_directory=${save_path}/${nginx_directory}
@@ -357,7 +357,7 @@ cd "${current_path}" || exit 1
 # cd ${save_path}
 if [[ ! -d ${redis_install_dir} ]]
 then
-    tar -xvf ${save_path}/${nginx_pkg_name} -C ${save_path}
+    tar -xvf ${save_path}/${redis_pkg_name} -C ${save_path}
     redis_work_directory=${save_path}/${redis_directory}
 
     printf "Exit the script if directory %s doesn't exist.\n" "${redis_work_directory}"

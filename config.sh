@@ -72,6 +72,7 @@ function get_unpacked_name(){
             echo "${filename}"
             return 0
         else
+            # http://pubs.opengroup.org/onlinepubs/9699919799.2016edition/utilities/V3_chap02.html#tag_18_06_02
             # Remove Smallest Suffix Pattern
             filename="${filename%.*}"
             # Remove Largest Prefix Pattern (greedy match)

@@ -40,6 +40,7 @@ while [ "$1" != "" ]; do
             rm -rf ${save_path}/mysql*
             rm -rf /usr/local/mysql*
             rm -f /etc/my.cnf
+            rm -f ~/mysql_initialize
             rm -f ${service_path}/mysql.service
             ;;
         --php )

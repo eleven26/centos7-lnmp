@@ -58,18 +58,24 @@ pkg_array=(
     "php:${php_pkg_name}:${php_pkg_url}"
     "redis:${redis_pkg_name}:${redis_pkg_url}"
     "nginx:${nginx_pkg_name}:${nginx_pkg_url}"
-    "phpredis:"
+    "phpredis:${phpredis_directory}:${phpredis_pkg_url}"
 )
 
+# Download mysql, php, nginx, redis, phpredis extension
 for item in "${pkg_array[@]}" ; do
     key=${item%%:*}
+    pkg_path=${item#*:}
+    path="${save_path}/${pkg_path%%:*}" # ex ${save_path}/${php_pkg_name}
+    url=${item##*:} # ex ${redis_pkg_url}
     if [[ ${key} == "phpredis" ]]
     then
+        if [[ ! -d ${path} ]]
+        then
+            printf "%s doesn't exist, begin to download...\n" "${path}"
+            git clone ${pkg_path%%:*} ${path}
+        fi
         continue
     fi
-    pkg_path=${item#*:}
-    path="${save_path}/${pkg_path%%:*}"
-    url=${item##*:}
     if [[ ! -f ${path} ]]
     then
         printf "%s doesn't exist, begin to download....\n" "${path}"
@@ -77,51 +83,27 @@ for item in "${pkg_array[@]}" ; do
     fi
 done
 
-# phpredis
-if [[ ! -d ${phpredis_directory} ]]
-then
-    git clone ${phpredis_pkg_url} ${phpredis_directory}
-fi
-
-
-pkg_file_array=(
-    "mysql:"
-)
 # judge whether all the files are downloaded succeed
-# mysql
-if [[ ! -f ${save_path}/${mysql_pkg_name} ]]
-then
-    printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${mysql_pkg_name}"
-    exit 1
-fi
-
-# php
-if [[ ! -f ${save_path}/${php_pkg_name} ]]
-then
-    printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${php_pkg_name}"
-    exit 1
-fi
-
-# nginx
-if [[ ! -f ${save_path}/${nginx_pkg_name} ]]
-then
-    printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${nginx_pkg_name}"
-    exit 1
-fi
-
-# redis
-if [[ ! -f ${save_path}/${redis_pkg_name} ]]
-then
-    printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${redis_pkg_name}"
-    exit 1
-fi
-
-# phpredis
-if [[ ! -d ${phpredis_directory} ]]
-then
-    printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${phpredis_directory}"
-    exit 1
-fi
+for item in "${pkg_array[@]}" ; do
+    key=${item%%:*}
+    pkg_path=${item#*:}
+    pkg_name=${pkg_path%%:*}
+    path="${save_path}/${pkg_name}"
+    if [[ ${key} == "phpredis" ]]
+    then
+        if [[ ! -d ${path} ]]
+        then
+            printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${pkg_name}"
+            exit 1
+        fi
+        continue
+    fi
+    if [[ ! -f ${path} ]]
+    then
+        printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${pkg_name}"
+        exit 1
+    fi
+done
 
 ########################################################################################################################
 # install mysql

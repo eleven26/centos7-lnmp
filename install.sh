@@ -67,7 +67,7 @@ for item in "${pkg_array[@]}" ; do
     pkg_path=${item#*:}
     path="${save_path}/${pkg_path%%:*}" # ex ${save_path}/${php_pkg_name}
     url=${item##*:} # ex ${redis_pkg_url}
-    if [[ ${key} = "phpredis" ]]
+    if [[ "${key}" = "phpredis" ]]
     then
         if [[ ! -d ${path} ]]
         then
@@ -89,7 +89,7 @@ for item in "${pkg_array[@]}" ; do
     pkg_path=${item#*:}
     pkg_name=${pkg_path%%:*}
     path="${save_path}/${pkg_name}"
-    if [[ ${key} = "phpredis" ]]
+    if [[ "${key}" = "phpredis" ]]
     then
         if [[ ! -d ${path} ]]
         then

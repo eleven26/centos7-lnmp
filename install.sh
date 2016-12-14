@@ -54,25 +54,27 @@ fi
 
 # bash4 is not universal yet, so we can not use associative array
 pkg_array=(
-    "mysql::${mysql_pkg_name}::${mysql_pkg_url}"
-    "php::${php_pkg_name}::${php_pkg_url}"
-    "redis::${redis_pkg_name}::${redis_pkg_url}"
-    "nginx::${nginx_pkg_name}::${nginx_pkg_url}"
-    "phpredis::${phpredis_directory}::${phpredis_pkg_url}"
+    "mysql:${mysql_pkg_name}:${mysql_pkg_url}"
+    "php:${php_pkg_name}:${php_pkg_url}"
+    "redis:${redis_pkg_name}:${redis_pkg_url}"
+    "nginx:${nginx_pkg_name}:${nginx_pkg_url}"
+    "phpredis:${phpredis_directory}:${phpredis_pkg_url}"
 )
 #todo url has : notation
 # Download mysql, php, nginx, redis, phpredis extension
+# % suffix, # prefix
 for item in "${pkg_array[@]}" ; do
-    key=${item%%::*}
-    pkg_path=${item#*::}
-    path="${save_path}/${pkg_path%%::*}" # ex ${save_path}/${php_pkg_name}
-    url=${item##*::} # ex ${redis_pkg_url}
+    key=${item%%:*}
+    value=${item#*:}
+    pkg_name=${value%%:*} # pkg_name(not include directory)
+    pkg_url=${value#*:} # pkg_url
+    path="${save_path}/${pkg_name}" # ex ${save_path}/${php_pkg_name}
     if [[ "${key}" = "phpredis" ]]
     then
-        if [[ ! -d ${path} ]]
+        if [[ ! -d ${pkg_name} ]]
         then
-            printf "%s doesn't exist, begin to download...\n" "${path}"
-            git clone ${url} ${path}
+            printf "%s doesn't exist, begin to download...\n" "${pkg_name}"
+            git clone ${url} ${pkg_name}
         fi
         continue
     fi
@@ -85,10 +87,11 @@ done
 
 # judge whether all the files are downloaded succeed
 for item in "${pkg_array[@]}" ; do
-    key=${item%%::*}
-    pkg_path=${item#*::}
-    pkg_name=${pkg_path%%::*}
-    path="${save_path}/${pkg_name}"
+    key=${item%%:*}
+    value=${item#*:}
+    pkg_name=${value%%:*} # pkg_name(not include directory)
+    pkg_url=${value#*:} # pkg_url
+    path="${save_path}/${pkg_name}" # ex ${save_path}/${php_pkg_name}
     if [[ "${key}" = "phpredis" ]]
     then
         if [[ ! -d ${path} ]]

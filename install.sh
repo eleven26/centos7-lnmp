@@ -69,6 +69,7 @@ for item in "${pkg_array[@]}" ; do
     pkg_name=${value%%:*} # pkg_name(not include directory)
     pkg_url=${value#*:} # pkg_url
     path="${save_path}/${pkg_name}" # ex ${save_path}/${php_pkg_name}
+
     if [[ "${key}" = "phpredis" ]]
     then
         if [[ ! -d ${pkg_name} ]]
@@ -76,30 +77,18 @@ for item in "${pkg_array[@]}" ; do
             printf "%s doesn't exist, begin to download...\n" "${pkg_name}"
             git clone ${pkg_url} ${pkg_name}
         fi
-        continue
-    fi
-    if [[ ! -f ${path} ]]
-    then
-        printf "%s doesn't exist, begin to download....\n" "${path}"
-        wget -O ${path} ${pkg_url}
-    fi
-done
-
-# judge whether all the files are downloaded succeed
-for item in "${pkg_array[@]}" ; do
-    key=${item%%:*}
-    value=${item#*:}
-    pkg_name=${value%%:*} # pkg_name(not include directory)
-    pkg_url=${value#*:} # pkg_url
-    path="${save_path}/${pkg_name}" # ex ${save_path}/${php_pkg_name}
-    if [[ "${key}" = "phpredis" ]]
-    then
         if [[ ! -d ${pkg_name} ]]
         then
             printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${pkg_name}"
             exit 1
         fi
         continue
+    fi
+
+    if [[ ! -f ${path} ]]
+    then
+        printf "%s doesn't exist, begin to download....\n" "${path}"
+        wget -O ${path} ${pkg_url}
     fi
     if [[ ! -f ${path} ]]
     then

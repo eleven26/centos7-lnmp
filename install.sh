@@ -170,7 +170,8 @@ then
     groupadd mysql
     useradd -r -g mysql -s /bin/false mysql
     printf "Changing mysql directory owned by mysql...\n"
-    chown -R mysql:mysql /usr/local/mysql
+    chown -R root:root /usr/local/mysql
+    chown -R mysql:mysql /usr/local/mysql/data
 
     # attention: the next line will generate output in ~/mysql_initialize, the root's password will be appeared in that file
     printf "Begin to initializing mysql....\n"

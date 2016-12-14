@@ -11,17 +11,20 @@ function usage() {
     printf "                  [--php]\n"
     printf "                  [--nginx]\n"
     printf "     --deps | --depends | --dependency     remove installed dependency\n"
-    printf "     --redis                                 remove redis\n"
-    printf "     --mysql                                 remove mysql\n"
-    printf "     --php                                   remove php\n"
-    printf "     --nginx                                 remove nginx\n"
-    printf "     --all                                   remove everything downloaded and installed\n"
+    printf "     --redis      remove redis\n"
+    printf "     --mysql      remove mysql\n"
+    printf "     --php        remove php\n"
+    printf "     --nginx      remove nginx\n"
+    printf "     --all        remove everything downloaded and installed\n"
     exit 1
 }
 
 if [ "$1" == "" ]; then
     usage
 fi
+
+# Attention! 
+# rm -rf ${variable}, if nothing after ${variable}, make sure that ${variable} is what you need.
 
 while [ "$1" != "" ]; do
     case $1 in

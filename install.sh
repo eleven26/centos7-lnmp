@@ -74,14 +74,14 @@ for item in "${pkg_array[@]}" ; do
         if [[ ! -d ${pkg_name} ]]
         then
             printf "%s doesn't exist, begin to download...\n" "${pkg_name}"
-            git clone ${url} ${pkg_name}
+            git clone ${pkg_url} ${pkg_name}
         fi
         continue
     fi
     if [[ ! -f ${path} ]]
     then
         printf "%s doesn't exist, begin to download....\n" "${path}"
-        wget -O ${path} ${url}
+        wget -O ${path} ${pkg_url}
     fi
 done
 

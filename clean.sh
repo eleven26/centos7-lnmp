@@ -53,10 +53,13 @@ while [ "$1" != "" ]; do
             ;;
         --all )
             # remove everything
-            set -- "--all" "--deps" "--redis" "--mysqsl" "--php" "--nginx"
+            set -- "--all" "--deps" "--redis" "--mysqsl" "--php" "--nginx" "--end"
             ;;
         --help )
             usage
+            exit
+            ;;
+        --end )
             exit
             ;;
             * )

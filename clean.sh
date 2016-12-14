@@ -28,18 +28,18 @@ fi
 
 while [ "$1" != "" ]; do
     case $1 in
-        --deps | --depends | --dependency )
+        --deps | deps | --depends | depends | --dependency | dependency )
             # delete installed dependency
             yum remove net-tools wget gcc autoconf bzip2 libaio pcre-devel make \
                 zlib-devel libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel \
                 libmcrypt-devel epel-release libmcrypt-devel.x86_64
             ;;
-        --redis )
+        --redis | redis )
             rm -rf ${save_path}/redis*
             rm -rf /usr/local/redis*
             rm -f ${service_path}/redis.service
             ;;
-        --mysql )
+        --mysql | mysql )
             sed "\%/usr/local/mysql/lib%d" /etc/ld.so.conf > /etc/ld.so.conf
             sed "\%/usr/local/mysql/bin%d" /etc/profile    > /etc/profile
             rm -rf ${save_path}/mysql*
@@ -48,27 +48,27 @@ while [ "$1" != "" ]; do
             rm -f ~/mysql_initialize
             rm -f ${service_path}/mysql.service
             ;;
-        --php )
+        --php | php )
             rm -rf ${save_path}/php*
             rm -rf /usr/local/php*
             sed "\%/usr/local/php/bin%d" /etc/profile > /etc/profile
             sed "\%/usr/local/php/sbin%d" /etc/profile > /etc/profile
             ;;
-        --nginx )
+        --nginx | nginx )
             rm -rf ${save_path}/nginx*
             rm -rf /usr/local/nginx*
             rm -f ${service_path}/nginx.service
             rm -f /usr/local/bin/nginx
             ;;
-        --all )
+        --all | all )
             # remove everything
-            set -- "--all" "--deps" "--redis" "--mysqsl" "--php" "--nginx" "--end"
+            set -- "--all" "--deps" "--redis" "--mysql" "--php" "--nginx" "--end"
             ;;
-        --help )
+        --help | help )
             usage
             exit
             ;;
-        --end )
+        --end | end )
             exit
             ;;
             * )

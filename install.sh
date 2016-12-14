@@ -72,7 +72,7 @@ for item in "${pkg_array[@]}" ; do
         if [[ ! -d ${path} ]]
         then
             printf "%s doesn't exist, begin to download...\n" "${path}"
-            git clone ${pkg_path%%:*} ${path}
+            git clone ${url} ${path}
         fi
         continue
     fi

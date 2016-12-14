@@ -86,7 +86,7 @@ mysql_directory=$(get_unpacked_name "${mysql_pkg_name}")
 php_directory=$(get_unpacked_name "${php_pkg_name}")
 redis_directory=$(get_unpacked_name "${redis_pkg_name}")
 nginx_directory=$(get_unpacked_name "${nginx_pkg_name}")
-phpredis_directory=${save_path}/phpredis
+phpredis_directory=phpredis
 
 mysql_install_dir=/usr/local/mysql
 php_install_dir=/usr/local/php

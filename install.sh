@@ -94,7 +94,7 @@ for item in "${pkg_array[@]}" ; do
     path="${save_path}/${pkg_name}" # ex ${save_path}/${php_pkg_name}
     if [[ "${key}" = "phpredis" ]]
     then
-        if [[ ! -d ${path} ]]
+        if [[ ! -d ${pkg_name} ]]
         then
             printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${pkg_name}"
             exit 1

@@ -60,7 +60,7 @@ pkg_array=(
     "nginx:${nginx_pkg_name}:${nginx_pkg_url}"
     "phpredis:${phpredis_directory}:${phpredis_pkg_url}"
 )
-
+#todo url has : notation
 # Download mysql, php, nginx, redis, phpredis extension
 for item in "${pkg_array[@]}" ; do
     key=${item%%:*}

@@ -40,8 +40,6 @@ while [ "$1" != "" ]; do
             rm -f ${service_path}/redis.service
             ;;
         --mysql | mysql )
-            sed "\%/usr/local/mysql/lib%d" /etc/ld.so.conf > /etc/ld.so.conf
-            sed "\%/usr/local/mysql/bin%d" /etc/profile    > /etc/profile
             rm -rf ${save_path}/mysql*
             rm -rf /usr/local/mysql*
             rm -f /etc/my.cnf
@@ -51,8 +49,6 @@ while [ "$1" != "" ]; do
         --php | php )
             rm -rf ${save_path}/php*
             rm -rf /usr/local/php*
-            sed "\%/usr/local/php/bin%d" /etc/profile > /etc/profile
-            sed "\%/usr/local/php/sbin%d" /etc/profile > /etc/profile
             ;;
         --nginx | nginx )
             rm -rf ${save_path}/nginx*

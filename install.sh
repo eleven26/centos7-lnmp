@@ -210,7 +210,7 @@ then
 
     printf "Exit script if %s doesn't exist." "${nginx_work_directory}"
     cd "${nginx_work_directory}" || exit 1
-    ./configure --with-http_stub_status_module
+    ./configure --with-http_stub_status_module --with-http_ssl_module
     make
     make install
 

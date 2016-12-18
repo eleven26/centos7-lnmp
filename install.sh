@@ -217,7 +217,7 @@ then
     # add bin to PATH
     ln -s /usr/local/nginx/sbin/nginx /usr/local/bin/
     if [[ ! -s /usr/local/bin/nginx ]]; then
-        add_env /usr/local/nginx/bin
+        add_env /usr/local/nginx/sbin
         # shellcheck source=/dev/null
         source ${profile_file}
     fi

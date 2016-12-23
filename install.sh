@@ -52,75 +52,50 @@ else
     printf "If packages doesn't exist, it will be download from the internet.\n"
 fi
 
-# mysql
-if [[ ! -f ${save_path}/${mysql_pkg_name} ]]
-then
-    printf "%s doesn't exist, begin to download....\n" "${save_path}/${mysql_pkg_name}"
-    wget -O ${save_path}/${mysql_pkg_name} ${mysql_pkg_url}
-fi
+# bash4 is not universal yet, so we can not use associative array
+pkg_array=(
+    "mysql:${mysql_pkg_name}:${mysql_pkg_url}"
+    "php:${php_pkg_name}:${php_pkg_url}"
+    "redis:${redis_pkg_name}:${redis_pkg_url}"
+    "nginx:${nginx_pkg_name}:${nginx_pkg_url}"
+    "phpredis:${phpredis_directory}:${phpredis_pkg_url}"
+)
+#todo url has : notation
+# Download mysql, php, nginx, redis, phpredis extension
+# % suffix, # prefix
+for item in "${pkg_array[@]}" ; do
+    key=${item%%:*}
+    value=${item#*:}
+    pkg_name=${value%%:*} # pkg_name(not include directory)
+    pkg_url=${value#*:} # pkg_url
+    path="${save_path}/${pkg_name}" # ex ${save_path}/${php_pkg_name}
 
-# php
-if [[ ! -f ${save_path}/${php_pkg_name} ]]
-then
-    printf "%s doesn't exist, begin to download...\n" "${save_path}/${php_pkg_name}"
-    wget -O ${save_path}/${php_pkg_name} ${php_pkg_url}
-fi
+    if [[ "${key}" = "phpredis" ]]
+    then
+        if [[ ! -d ${pkg_name} ]]
+        then
+            printf "%s doesn't exist, begin to download...\n" "${pkg_name}"
+            git clone ${pkg_url} ${pkg_name}
+        fi
+        if [[ ! -d ${pkg_name} ]]
+        then
+            printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${pkg_name}"
+            exit 1
+        fi
+        continue
+    fi
 
-# redis
-if [[ ! -f ${save_path}/${redis_pkg_name} ]]
-then
-    printf "%s doesn't exist, begin to download...\n" "${save_path}/${redis_pkg_name}"
-    wget -O ${save_path}/${redis_pkg_name} ${redis_pkg_url}
-fi
-
-# nginx
-if [[ ! -f ${save_path}/${nginx_pkg_name} ]]
-then
-    printf "%s doesn't exist, begin to download...\n" "${save_path}/${nginx_pkg_name}"
-    wget -O ${save_path}/${nginx_pkg_name} ${nginx_pkg_url}
-fi
-
-# phpredis
-if [[ ! -d ${phpredis_directory} ]]
-then
-    git clone ${phpredis_pkg_url} ${phpredis_directory}
-fi
-
-# judge whether all the files are downloaded succeed
-# mysql
-if [[ ! -f ${save_path}/${mysql_pkg_name} ]]
-then
-    printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${mysql_pkg_name}"
-    exit 1
-fi
-
-# php
-if [[ ! -f ${save_path}/${php_pkg_name} ]]
-then
-    printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${php_pkg_name}"
-    exit 1
-fi
-
-# nginx
-if [[ ! -f ${save_path}/${nginx_pkg_name} ]]
-then
-    printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${nginx_pkg_name}"
-    exit 1
-fi
-
-# redis
-if [[ ! -f ${save_path}/${redis_pkg_name} ]]
-then
-    printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${redis_pkg_name}"
-    exit 1
-fi
-
-# phpredis
-if [[ ! -d ${phpredis_directory} ]]
-then
-    printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${phpredis_directory}"
-    exit 1
-fi
+    if [[ ! -f ${path} ]]
+    then
+        printf "%s doesn't exist, begin to download....\n" "${path}"
+        wget -O ${path} ${pkg_url}
+    fi
+    if [[ ! -f ${path} ]]
+    then
+        printf "Download %s failed! please check if the given url is valid or check if the save path is valid." "${pkg_name}"
+        exit 1
+    fi
+done
 
 ########################################################################################################################
 # install mysql
@@ -195,7 +170,8 @@ then
     groupadd mysql
     useradd -r -g mysql -s /bin/false mysql
     printf "Changing mysql directory owned by mysql...\n"
-    chown -R mysql:mysql /usr/local/mysql
+    chown -R root:root /usr/local/mysql
+    chown -R mysql:mysql /usr/local/mysql/data
 
     # attention: the next line will generate output in ~/mysql_initialize, the root's password will be appeared in that file
     printf "Begin to initializing mysql....\n"
@@ -234,14 +210,14 @@ then
 
     printf "Exit script if %s doesn't exist." "${nginx_work_directory}"
     cd "${nginx_work_directory}" || exit 1
-    ./configure --with-http_stub_status_module
+    ./configure --with-http_stub_status_module --with-http_ssl_module
     make
     make install
 
     # add bin to PATH
     ln -s /usr/local/nginx/sbin/nginx /usr/local/bin/
     if [[ ! -s /usr/local/bin/nginx ]]; then
-        add_env /usr/local/nginx/bin
+        add_env /usr/local/nginx/sbin
         # shellcheck source=/dev/null
         source ${profile_file}
     fi

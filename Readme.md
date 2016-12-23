@@ -33,6 +33,10 @@ Enter the repository directory. The packages will be save at  /path/to/centos7-l
 ```
 cd centos7-lnmp
 ```
+Checkout branch to tag v1-stable, master or master-dev is in development.
+```
+git checkout v1-stable
+```
 Change the installation script mode so that we can run it.
 ```
 chmod +x install.sh

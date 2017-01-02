@@ -51,7 +51,8 @@ php_configure_option=$(cat << EOF
 --with-zlib \
 --enable-pdo \
 --with-pdo-mysql \
---enable-opcache
+--enable-opcache \
+--enable-exif
 EOF
 )
 

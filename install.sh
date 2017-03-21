@@ -229,13 +229,13 @@ then
         mkdir ${vhost_dir}
     fi
     # add vhost example
-    cp "${current_path}/nginx/vhost/vhost-default.conf.example" /usr/local/nginx/vhost
+    cp "${current_path}/nginx/vhost/vhost-default.conf.example" /usr/local/nginx/conf/vhost
     rewrite_dir=/usr/local/nginx/conf/rewrite
     if [[ ! -d ${rewrite_dir} ]]
     then
         mkdir ${rewrite_dir}
     fi
-    cp "${current_path}/nginx/rewrite/laravel.conf" /usr/local/nginx/rewrite
+    cp "${current_path}/nginx/rewrite/laravel.conf" /usr/local/nginx/conf/rewrite
 
     # add nginx service
     cp "${current_path}/systemd/nginx.service" ${service_path}

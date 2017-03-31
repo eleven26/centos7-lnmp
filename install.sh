@@ -23,7 +23,7 @@ yum -y install net-tools wget vim gcc git autoconf bzip2 libaio pcre-devel make 
     zlib-devel libxml2-devel openssl-devel curl-devel libjpeg-devel libpng-devel freetype-devel openldap-devel
 
 centos_version=$(hostnamectl | grep "Operating System" | awk '{print $5}')
-if [[ ${centos_version} -ne 7 ]]
+if [[ ${centos_version} -lt 7 ]]
 then
     yum -y install libmcrypt-devel
 else

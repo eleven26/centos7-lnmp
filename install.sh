@@ -154,6 +154,10 @@ then
         printf message >> ${install_log}
     fi
 
+    if [[!-d /etc/my.cnf.d ]]; then
+        mkdir /etc/my.cnf.d
+    fi
+
     if [[ -f ${current_path}/systemd/mysql.service ]]; then
         printf "Copy mysql service file to %s, so that mysql can run as a system's service...\n" "${service_path}"
         cp "${current_path}/systemd/mysql.service" ${service_path}

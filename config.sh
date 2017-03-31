@@ -17,6 +17,14 @@ php_pkg_name=$(echo ${php_pkg_url} | awk -F '/' '{print $5}')
 redis_pkg_name=$(echo ${redis_pkg_url} | awk -F '/' '{print $NF}')
 nginx_pkg_name=$(echo ${nginx_pkg_url} | awk -F '/' '{print $NF}')
 
+# if you have been downloaded the source code, write the path below.
+# And don't forget, remove the '#'.
+
+# mysql_pkg_name=
+# php_pkg_name=
+# redis_pkg_name=
+# nginx_pkg_name=
+
 php_configure_option=$(cat << EOF
 --prefix=/usr/local/php \
 --with-config-file-path=/usr/local/php/etc \

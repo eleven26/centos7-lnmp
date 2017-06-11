@@ -1,3 +1,4 @@
+### 这个就很好用了，https://lnmp.org/，下面这个适用场景太窄了
 
 CentOS 7 - lnmp
 ===
